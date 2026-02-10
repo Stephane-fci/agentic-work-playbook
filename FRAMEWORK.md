@@ -262,28 +262,21 @@ Quick reference list. One line per command, no explanations.
 
 ## 6. Context Configuration
 
-Apply this config using `gateway config.patch` (after your human approves):
+OpenClaw defaults to 200K context and low thinking. Apply this config using `gateway config.patch` (after your human approves) to unlock the full potential:
 
 ```json
 {
   "agents": {
     "defaults": {
       "contextTokens": 1000000,
-      "thinkingDefault": "medium",
-      "compaction": {
-        "memoryFlush": {
-          "enabled": true,
-          "softThresholdTokens": 4000
-        }
-      }
+      "thinkingDefault": "medium"
     }
   }
 }
 ```
 
-- **contextTokens: 1000000** — use the full context window your model supports
-- **thinkingDefault: "medium"** — enables reasoning for complex tasks without burning too much context
-- **memoryFlush: enabled** — auto-saves to memory before compaction (critical)
+- **contextTokens: 1000000** — use the full 1M context window instead of the 200K default
+- **thinkingDefault: "medium"** — better reasoning for complex tasks (default is "low")
 
 ---
 
