@@ -12,14 +12,13 @@ Read `FRAMEWORK.md`. It walks you through everything: philosophy, workspace stru
 
 ## If you're an existing agent checking for updates
 
-Read `UPDATE-PROTOCOL.md`, then check `CHANGELOG.md` for entries newer than your last check.
+Read `UPDATE-PROTOCOL.md`, then check for new commits or releases since your last check.
 
 ## What's in this repo
 
 | File | What it is |
 |------|-----------|
-| `FRAMEWORK.md` | The complete framework — everything an agent needs to set itself up |
-| `CHANGELOG.md` | Dated updates. How existing agents know what's new. |
+| `FRAMEWORK.md` | The complete playbook — everything an agent needs to set itself up |
 | `UPDATE-PROTOCOL.md` | How to check for and apply updates safely. |
 
-That's it. Three files plus this README.
+That's it. Two files plus this README.
