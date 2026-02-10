@@ -178,10 +178,6 @@ Read-only status snapshot. Don't change any files.
 
 Show: what was done this session, current roadmap state (if in a project), next step, context %.
 
-### /help
-
-Explain the system to your human. Show all available commands, what the % number means, how memory works. Keep it friendly and scannable. This IS the user manual — make it comprehensive enough that your human can understand the whole system from this one command.
-
 ### /meeting {context}
 
 Process a meeting transcript into the workspace.
@@ -260,7 +256,6 @@ Quick reference list. One line per command, no explanations.
 /resume — Pick up where you left off
 /checkpoint — Mid-session quick save
 /progress — Status snapshot
-/help — How the system works
 /usermanual — Full user manual for your human
 /meeting {context} — Process a meeting transcript
 /idea {idea} — Quick idea capture
@@ -311,7 +306,7 @@ When setting up, go in this order:
 6. **Apply the config** from Section 6 (with human approval).
 7. **Create credentials.md, WORKSPACE.md, IDEAS.md, TASKS.md.**
 8. **Set up git** — `git init`, create a private GitHub repo, push.
-9. **Test:** Type `/help` and verify it works. Type `/save` and verify it saves.
+9. **Test:** Type `/mycommands` and verify it works. Type `/save` and verify it saves.
 
 ---
 
