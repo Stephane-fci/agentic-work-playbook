@@ -430,21 +430,92 @@ If the repo is private, you may include actual key values. If public, use this a
 
 ---
 
-## 10. Implementation Order
+## 10. Keeping OpenClaw Up to Date
+
+OpenClaw is actively developed. New versions bring model support, bug fixes, and features. **Always run the latest version.**
+
+### Before Anything Else: Update
+
+When setting up a new agent or resuming after time away, the **first step** is always:
+
+```bash
+# Check current version
+openclaw --version
+
+# Check latest available
+npm view openclaw version
+
+# Update if needed (with human approval)
+npm i -g openclaw@latest
+openclaw doctor
+openclaw gateway restart
+```
+
+**Why first?** New versions often include model catalog updates, security fixes, and config schema changes. Setting up workspace structure on an outdated version can cause issues.
+
+### Weekly Update Checker (Cron Job)
+
+Set up a cron job so you're never more than a week behind. The agent checks for updates every Monday morning and only notifies the human if there's a new version available.
+
+**Cron job setup:**
+- **Schedule:** Weekly (e.g., Monday 9:00 AM in the human's timezone)
+- **Type:** Isolated agent turn (runs independently, doesn't interrupt current work)
+- **Behavior:** Compare installed vs latest npm version. Only message the human if an update exists. Stay silent if already current.
+- **Where to notify:** The agent's primary channel — wherever it normally talks to its human.
+
+**Example cron configuration:**
+```json
+{
+  "name": "OpenClaw Update Checker",
+  "schedule": {
+    "kind": "cron",
+    "expr": "0 9 * * 1",
+    "tz": "Europe/Paris"
+  },
+  "sessionTarget": "isolated",
+  "payload": {
+    "kind": "agentTurn",
+    "message": "Check if there's a newer version of OpenClaw available. Run `openclaw --version` to get the current installed version, then run `npm view openclaw version` to get the latest published version. Compare them. If there's an update available, send a message to your primary channel telling your human what version you're on, what's available, and ask if they want you to run the update. If already on the latest, do nothing — no message needed.",
+    "timeoutSeconds": 120
+  },
+  "delivery": { "mode": "none" }
+}
+```
+
+Adapt the timezone, schedule, and channel to your setup. The key principle: **check weekly, notify only when needed, never auto-update without human approval.**
+
+### Update Procedure
+
+When an update is available and the human approves:
+
+1. `npm i -g openclaw@latest` — install the new version
+2. `openclaw doctor` — check for issues
+3. Remove any custom model definitions that are now in the native catalog
+4. `openclaw gateway restart` — apply the update
+5. Verify: confirm version, check that config is intact, test a basic interaction
+6. **Rollback if needed:** `npm i -g openclaw@<previous-version>`
+
+**Never update without telling your human first.** Even if they asked you to set up auto-checking, the actual update always requires approval.
+
+---
+
+## 11. Implementation Order
 
 When setting up, go in this order:
 
-1. **Read this document with your human.** Discuss what makes sense for your setup.
-2. **Create the folder structure** (knowledge/, projects/, meetings/, projects/_template/).
-3. **Create COMMANDS.md** with the slash commands from Section 5.
-4. **Add sections to SOUL.md** from Section 3.
-5. **Add sections to AGENTS.md** from Section 4.
-6. **Disable daily session resets** from Section 6 (with human approval).
-7. **Apply thinking level** from Section 7 (with human approval).
-8. **Install recommended skills** from Section 8 (at minimum: web-search).
-9. **Create credentials.md, WORKSPACE.md, IDEAS.md, TASKS.md.**
-10. **Set up git** — `git init`, create a private GitHub repo, push.
-11. **Test:** Type `/mycommands` and verify it works. Type `/save` and verify it saves.
+1. **Update OpenClaw to the latest version** (Section 10). Always first.
+2. **Read this document with your human.** Discuss what makes sense for your setup.
+3. **Create the folder structure** (knowledge/, projects/, meetings/, projects/_template/).
+4. **Create COMMANDS.md** with the slash commands from Section 5.
+5. **Add sections to SOUL.md** from Section 3.
+6. **Add sections to AGENTS.md** from Section 4.
+7. **Disable daily session resets** from Section 6 (with human approval).
+8. **Apply thinking level** from Section 7 (with human approval).
+9. **Install recommended skills** from Section 8 (at minimum: web-search).
+10. **Create credentials.md, WORKSPACE.md, IDEAS.md, TASKS.md.**
+11. **Set up git** — `git init`, create a private GitHub repo, push.
+12. **Set up the weekly update checker cron** from Section 10.
+13. **Test:** Type `/mycommands` and verify it works. Type `/save` and verify it saves.
 
 ---
 
