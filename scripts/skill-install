@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+# skill-install — Safe skill installation for OpenClaw
+# Downloads a skill to quarantine, scans it, and only installs if approved.
+#
+# Usage:
+#   skill-install <github-url>              Download + scan from GitHub
+#   skill-install <clawhub-slug>            Download + scan from ClawHub
+#   skill-install --approve <skill-name>    Move approved skill from quarantine to skills dir
+#   skill-install --reject <skill-name>     Delete rejected skill from quarantine
+#   skill-install --list                    List quarantined skills
+#
+# Flow: download → quarantine → scan → STOP → human approves → install
+
+set -euo pipefail
+
+QUARANTINE_DIR="${HOME}/.skill-quarantine"
+SKILLS_DIR="${HOME}/.openclaw/skills"
+
+# Colors
+if [ -t 1 ]; then
+  RED='\033[0;31m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; BOLD='\033[1m'; NC='\033[0m'
+else
+  RED=''; YELLOW=''; GREEN=''; BOLD=''; NC=''
+fi
+
+mkdir -p "$QUARANTINE_DIR" "$SKILLS_DIR"
+
+# --- Commands ---
+
+cmd_list() {
+  echo -e "${BOLD}Quarantined skills:${NC}"
+  local found=false
+  for dir in "$QUARANTINE_DIR"/*/; do
+    [ -d "$dir" ] || continue
+    found=true
+    local name=$(basename "$dir")
+    local result=$(skill-audit "$dir" 2>&1) || true
+    echo "  $result"
+  done
+  if [ "$found" = false ]; then
+    echo "  (empty)"
+  fi
+}
+
+cmd_approve() {
+  local name="$1"
+  local src="$QUARANTINE_DIR/$name"
+  local dst="$SKILLS_DIR/$name"
+
+  if [ ! -d "$src" ]; then
+    echo -e "${RED}Error: '$name' not found in quarantine${NC}"
+    exit 1
+  fi
+
+  # Re-scan before approving
+  local result
+  result=$(skill-audit "$src" 2>&1) || true
+  echo "$result"
+
+  if echo "$result" | grep -q "FAIL"; then
+    echo -e "${RED}⚠️  This skill FAILED the audit. Are you sure? (y/N)${NC}"
+    read -r confirm
+    if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+      echo "Aborted."
+      exit 1
+    fi
+  fi
+
+  mv "$src" "$dst"
+  echo -e "${GREEN}✅ Installed '$name' to $dst${NC}"
+}
+
+cmd_reject() {
+  local name="$1"
+  local src="$QUARANTINE_DIR/$name"
+
+  if [ ! -d "$src" ]; then
+    echo -e "${RED}Error: '$name' not found in quarantine${NC}"
+    exit 1
+  fi
+
+  rm -rf "$src"
+  echo -e "${GREEN}🗑️  Removed '$name' from quarantine${NC}"
+}
+
+cmd_download() {
+  local source="$1"
+  local name=""
+
+  if [[ "$source" == http* ]]; then
+    # GitHub URL — extract skill name and download
+    # Expected: https://github.com/openclaw/skills/tree/main/skills/<author>/<name>/SKILL.md
+    # Or: https://github.com/<user>/<repo> (whole repo)
+
+    if [[ "$source" == *"/SKILL.md" ]]; then
+      # Direct SKILL.md URL — convert tree URL to raw
+      name=$(echo "$source" | sed 's|.*/skills/[^/]*/||;s|/SKILL.md||;s|/.*||')
+      local raw_url=$(echo "$source" | sed 's|github.com|raw.githubusercontent.com|;s|/tree/|/|;s|/blob/|/|')
+    elif [[ "$source" == *"github.com"* ]]; then
+      # Repo or directory URL
+      name=$(basename "$source")
+      # Try to find SKILL.md in the repo
+      local raw_base=$(echo "$source" | sed 's|github.com|raw.githubusercontent.com|;s|/tree/|/|;s|/blob/|/|')
+      local raw_url="${raw_base}/main/SKILL.md"
+    else
+      echo -e "${RED}Error: unsupported URL format${NC}"
+      exit 1
+    fi
+
+    if [ -z "$name" ]; then
+      name=$(basename "$source")
+    fi
+
+    local dest="$QUARANTINE_DIR/$name"
+    mkdir -p "$dest"
+
+    echo -e "${BOLD}Downloading '$name' to quarantine...${NC}"
+    if curl -sfL "$raw_url" -o "$dest/SKILL.md" 2>/dev/null; then
+      local size=$(wc -c < "$dest/SKILL.md")
+      echo "  Downloaded: $size bytes"
+    else
+      # Try alternative raw URL patterns
+      rm -rf "$dest"
+      echo -e "${RED}Error: could not download SKILL.md from $source${NC}"
+      exit 1
+    fi
+
+  else
+    # Assume ClawHub slug
+    name="$source"
+    local dest="$QUARANTINE_DIR/$name"
+    mkdir -p "$dest"
+
+    echo -e "${BOLD}Downloading '$name' from ClawHub to quarantine...${NC}"
+    # Try the openclaw skills repo format
+    local raw_url="https://raw.githubusercontent.com/openclaw/skills/main/skills/*/$name/SKILL.md"
+    # ClawHub skills are in the openclaw/skills repo, but we don't know the author
+    # Use the GitHub API to search
+    local search_result=$(curl -sf "https://api.github.com/search/code?q=filename:SKILL.md+path:skills+repo:openclaw/skills+$name" 2>/dev/null | grep -o '"path":"[^"]*"' | head -1 | sed 's/"path":"//;s/"//')
+
+    if [ -n "$search_result" ]; then
+      curl -sfL "https://raw.githubusercontent.com/openclaw/skills/main/$search_result" -o "$dest/SKILL.md"
+      local size=$(wc -c < "$dest/SKILL.md")
+      echo "  Downloaded: $size bytes"
+    else
+      rm -rf "$dest"
+      echo -e "${RED}Error: could not find '$name' on ClawHub${NC}"
+      exit 1
+    fi
+  fi
+
+  # Auto-scan
+  echo ""
+  echo -e "${BOLD}Scanning...${NC}"
+  local result
+  result=$(skill-audit "$dest" 2>&1) || true
+  echo "$result"
+  echo ""
+
+  if echo "$result" | grep -q "PASS"; then
+    echo -e "${GREEN}Ready to install. Run: skill-install --approve $name${NC}"
+  elif echo "$result" | grep -q "WARN"; then
+    echo -e "${YELLOW}⚠️  Warnings found. Review with Stephane before installing.${NC}"
+    echo -e "  Approve: skill-install --approve $name"
+    echo -e "  Reject:  skill-install --reject $name"
+  else
+    echo -e "${RED}🚫 FAILED audit. Do NOT install without Stephane's explicit approval.${NC}"
+    echo -e "  Reject:  skill-install --reject $name"
+  fi
+}
+
+# --- Main ---
+case "${1:-}" in
+  --list|-l)
+    cmd_list
+    ;;
+  --approve|-a)
+    [ -n "${2:-}" ] || { echo "Usage: skill-install --approve <name>"; exit 1; }
+    cmd_approve "$2"
+    ;;
+  --reject|-r)
+    [ -n "${2:-}" ] || { echo "Usage: skill-install --reject <name>"; exit 1; }
+    cmd_reject "$2"
+    ;;
+  --help|-h|"")
+    echo "skill-install — Safe skill installation for OpenClaw"
+    echo ""
+    echo "Usage:"
+    echo "  skill-install <github-url>           Download + scan"
+    echo "  skill-install <clawhub-slug>          Download + scan"
+    echo "  skill-install --approve <name>        Install approved skill"
+    echo "  skill-install --reject <name>         Delete rejected skill"
+    echo "  skill-install --list                  List quarantined skills"
+    ;;
+  *)
+    cmd_download "$1"
+    ;;
+esac

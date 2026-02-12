@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+# skill-audit — External skill security scanner for OpenClaw
+# Scans SKILL.md files for prompt injection patterns BEFORE agent reads them.
+# Returns ONLY sanitized verdicts — never echoes raw content.
+#
+# Usage:
+#   skill-audit <path>              Full paranoid scan (for external/untrusted skills)
+#   skill-audit --trusted <path>    Lighter scan (for already-vetted skills)
+#   skill-audit --all-builtin       Scan all built-in OpenClaw skills (trusted mode)
+#   skill-audit --all-custom        Scan all custom skills (trusted mode)
+#
+# Exit codes: 0 = PASS, 1 = FAIL, 2 = WARN
+
+set -euo pipefail
+
+# Colors (only if terminal)
+if [ -t 1 ]; then
+  RED='\033[0;31m'; YELLOW='\033[1;33m'; GREEN='\033[0;32m'; BOLD='\033[1m'; NC='\033[0m'
+else
+  RED=''; YELLOW=''; GREEN=''; BOLD=''; NC=''
+fi
+
+TRUSTED=false
+
+# --- Argument handling ---
+if [ $# -lt 1 ]; then
+  echo "Usage: skill-audit [--trusted] <path-to-skill-dir-or-file>"
+  echo "       skill-audit --all-builtin    Scan all built-in skills"
+  echo "       skill-audit --all-custom     Scan all custom skills"
+  echo ""
+  echo "Options:"
+  echo "  --trusted    Lighter scan for already-vetted skills"
+  echo "  (default)    Full paranoid scan for external/untrusted skills"
+  exit 1
+fi
+
+# Batch modes
+if [ "$1" = "--all-builtin" ]; then
+  echo -e "${BOLD}Scanning built-in OpenClaw skills (trusted mode)...${NC}"
+  PASS=0; WARN=0; FAIL=0
+  for dir in /usr/lib/node_modules/openclaw/skills/*/; do
+    result=$(skill-audit --trusted "$dir" 2>&1) || true
+    echo "$result"
+    case "$result" in
+      *PASS*) ((PASS++)) ;;
+      *WARN*) ((WARN++)) ;;
+      *FAIL*) ((FAIL++)) ;;
+    esac
+  done
+  echo -e "\n${BOLD}Summary:${NC} ${GREEN}$PASS pass${NC} | ${YELLOW}$WARN warn${NC} | ${RED}$FAIL fail${NC}"
+  exit 0
+fi
+
+if [ "$1" = "--all-custom" ]; then
+  echo -e "${BOLD}Scanning custom skills (trusted mode)...${NC}"
+  PASS=0; WARN=0; FAIL=0
+  for dir in /root/clawd/skills/*/ /root/.openclaw/skills/*/; do
+    [ -d "$dir" ] || continue
+    result=$(skill-audit --trusted "$dir" 2>&1) || true
+    echo "$result"
+    case "$result" in
+      *PASS*) ((PASS++)) ;;
+      *WARN*) ((WARN++)) ;;
+      *FAIL*) ((FAIL++)) ;;
+    esac
+  done
+  echo -e "\n${BOLD}Summary:${NC} ${GREEN}$PASS pass${NC} | ${YELLOW}$WARN warn${NC} | ${RED}$FAIL fail${NC}"
+  exit 0
+fi
+
+if [ "$1" = "--trusted" ]; then
+  TRUSTED=true
+  shift
+fi
+
+if [ $# -lt 1 ]; then
+  echo "Error: no path provided"
+  exit 1
+fi
+
+TARGET="$1"
+SKILL_NAME="$(basename "$TARGET")"
+
+# Resolve target to list of files to scan
+FILES=()
+if [ -d "$TARGET" ]; then
+  while IFS= read -r -d '' f; do
+    FILES+=("$f")
+  done < <(find "$TARGET" -type f \( -name "*.md" -o -name "*.txt" -o -name "*.yaml" -o -name "*.yml" -o -name "*.json" -o -name "*.sh" -o -name "*.bash" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) -print0 2>/dev/null)
+elif [ -f "$TARGET" ]; then
+  FILES+=("$TARGET")
+  SKILL_NAME="$(basename "$(dirname "$TARGET")")"
+else
+  echo "SKILL_AUDIT: ERROR | $SKILL_NAME | target not found: $TARGET"
+  exit 1
+fi
+
+if [ ${#FILES[@]} -eq 0 ]; then
+  echo "SKILL_AUDIT: ERROR | $SKILL_NAME | no scannable files found"
+  exit 1
+fi
+
+# --- Pattern definitions ---
+
+# CRITICAL patterns — always checked, even in trusted mode
+# These are the real injection attacks
+declare -A CRITICAL_PATTERNS
+
+if [ "$TRUSTED" = true ]; then
+  # Trusted mode: only check for actual injection attacks
+  CRITICAL_PATTERNS=(
+    ["hidden_html_instructions"]='<!--[^>]*[a-zA-Z]{10,}[^>]*-->'
+    ["hex_unicode_obfuscation"]='\\x[0-9a-fA-F]{2}(\\x[0-9a-fA-F]{2}){3,}|\\u[0-9a-fA-F]{4}(\\u[0-9a-fA-F]{4}){3,}'
+  )
+else
+  # Paranoid mode (default): full scan for external skills
+  CRITICAL_PATTERNS=(
+    ["hidden_html_instructions"]='<!--[^>]*[a-zA-Z]{10,}[^>]*-->'
+    ["base64_payload"]='[A-Za-z0-9+/]{60,}={0,2}'
+    ["credential_access"]='credentials\.md|\.env\b|PRIVATE_KEY|wallet\.dat|\.ssh/id_|keychain|keystore'
+    ["exfil_curl_wget"]='curl\s+.*https?://(?!(github\.com|docs\.|localhost|127\.0\.0\.1|api\.(openai|anthropic|x\.ai|google)))|wget\s+https?://(?!(github\.com|docs\.))'
+    ["eval_exec"]='\beval\s*[\s"'\''(]|\beval\s+"\$|\bexec\s*\(|\bFunction\s*\(|child_process|\.spawn\s*\(|\.execSync\s*\('
+    ["hex_unicode_obfuscation"]='\\x[0-9a-fA-F]{2}(\\x[0-9a-fA-F]{2}){3,}|\\u[0-9a-fA-F]{4}(\\u[0-9a-fA-F]{4}){3,}'
+  )
+fi
+
+# WARNING patterns
+declare -A WARN_PATTERNS
+
+if [ "$TRUSTED" = true ]; then
+  # Trusted: only the most suspicious patterns
+  WARN_PATTERNS=(
+    ["prompt_override"]='ignore\s+(all\s+)?previous\s+instructions|you\s+are\s+now\s+a|new\s+instructions:|forget\s+(your|all)\s+(previous\s+)?instructions|disregard\s+(all|your)\s+(previous\s+)?instructions'
+    ["data_exfil_patterns"]='send\s+(the\s+)?(contents?|data|keys?|tokens?|credentials?)\s+to|exfiltrate|phone\s*home'
+  )
+else
+  # Paranoid: full warning set
+  WARN_PATTERNS=(
+    ["prompt_override"]='ignore\s+(all\s+)?previous|you\s+are\s+now|new\s+instructions|forget\s+(your|all|previous)|disregard\s+(all|your|previous)'
+    ["destructive_commands"]='rm\s+-rf\s+/|del\s+/[a-z]|format\s+[a-z]:|mkfs\.'
+    ["raw_ip_access"]='https?://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}[:/]'
+    ["suspicious_paths"]='/etc/passwd|/etc/shadow'
+    ["data_exfil_patterns"]='send\s+(the\s+)?(contents?|data|keys?|tokens?|credentials?)\s+to|upload\s+(the\s+)?(contents?|data)\s+to|exfiltrate|phone\s*home'
+  )
+fi
+
+# --- Scanning ---
+CRITICAL_HITS=()
+WARN_HITS=()
+
+for file in "${FILES[@]}"; do
+  # Critical checks
+  for check_name in "${!CRITICAL_PATTERNS[@]}"; do
+    pattern="${CRITICAL_PATTERNS[$check_name]}"
+    if grep -qPi "$pattern" "$file" 2>/dev/null; then
+      if [[ ! " ${CRITICAL_HITS[*]:-} " =~ " ${check_name} " ]]; then
+        CRITICAL_HITS+=("$check_name")
+      fi
+    fi
+  done
+
+  # Warning checks
+  for check_name in "${!WARN_PATTERNS[@]}"; do
+    pattern="${WARN_PATTERNS[$check_name]}"
+    if grep -qPi "$pattern" "$file" 2>/dev/null; then
+      if [[ ! " ${WARN_HITS[*]:-} " =~ " ${check_name} " ]]; then
+        WARN_HITS+=("$check_name")
+      fi
+    fi
+  done
+
+  # Special check: HTML comments with substantial content (hidden instructions)
+  if grep -qP '<!--[\s\S]{30,}?-->' "$file" 2>/dev/null; then
+    if [[ ! " ${CRITICAL_HITS[*]:-} " =~ " hidden_html_long " ]]; then
+      CRITICAL_HITS+=("hidden_html_long")
+    fi
+  fi
+done
+
+# --- Verdict ---
+CRIT_COUNT=${#CRITICAL_HITS[@]}
+WARN_COUNT=${#WARN_HITS[@]}
+
+MODE_TAG=""
+if [ "$TRUSTED" = true ]; then
+  MODE_TAG=" [trusted]"
+fi
+
+if [ "$CRIT_COUNT" -gt 0 ]; then
+  CRIT_LIST=$(IFS=', '; echo "${CRITICAL_HITS[*]}")
+  echo -e "${RED}SKILL_AUDIT: FAIL${NC} | $SKILL_NAME$MODE_TAG | $CRIT_COUNT critical: $CRIT_LIST"
+  if [ "$WARN_COUNT" -gt 0 ]; then
+    WARN_LIST=$(IFS=', '; echo "${WARN_HITS[*]}")
+    echo -e "${YELLOW}  + $WARN_COUNT warnings: $WARN_LIST${NC}"
+  fi
+  exit 1
+elif [ "$WARN_COUNT" -gt 0 ]; then
+  WARN_LIST=$(IFS=', '; echo "${WARN_HITS[*]}")
+  echo -e "${YELLOW}SKILL_AUDIT: WARN${NC} | $SKILL_NAME$MODE_TAG | $WARN_COUNT warnings: $WARN_LIST"
+  exit 2
+else
+  echo -e "${GREEN}SKILL_AUDIT: PASS${NC} | $SKILL_NAME$MODE_TAG | 0 issues"
+  exit 0
+fi
