@@ -795,6 +795,95 @@ This is how you catch drift — agents that were set up months ago gradually fal
 
 ---
 
+## 15b. OpenClaw Config Gotchas
+
+Real config pitfalls discovered through production deployments. Each of these has caused a crash or lockout.
+
+### Invalid keys crash on startup
+
+OpenClaw validates config strictly. An unrecognized key doesn't get ignored — it crashes the gateway on startup. There's no dry-run or validation command. If you add a key that doesn't exist, you're offline until someone manually edits the JSON.
+
+**Known invalid keys (as of v2026.2.12):**
+- `memory.enabled` — no such key. To disable memory, remove the `memory` block entirely.
+- `agents.defaults.session` — doesn't exist.
+- `channels.discord.dmPolicy` — doesn't exist.
+
+**Rule:** Only set keys you've verified in the config schema. When in doubt, check `openclaw config get` output for the current valid structure.
+
+### `thinkingDefault` vs `thinking`
+
+Under `agents.defaults`, the correct key is `thinkingDefault`, NOT `thinking`.
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "thinkingDefault": "medium"
+    }
+  }
+}
+```
+
+Using `thinking` will crash OpenClaw on startup (confirmed on v2026.2.12).
+
+### Discord bot token field
+
+The Discord bot token goes in `channels.discord.token`, NOT `channels.discord.botToken`.
+
+### Auth profiles format
+
+In `agents/main/agent/auth-profiles.json`, the format is:
+
+```json
+[{ "type": "token", "token": "your-api-key-here" }]
+```
+
+NOT `{ "type": "apikey", "apiKey": "..." }`.
+
+### `contextTokens` vs `contextWindow`
+
+`contextWindow` in the model registry only defines what the model *supports* (its maximum capacity). The actual session cap is `agents.defaults.contextTokens` (defaults to 200K). If you're using a model with a large context window (e.g., 1M), you must set BOTH:
+
+```json
+{
+  "agents": {
+    "defaults": {
+      "contextTokens": 1000000
+    }
+  }
+}
+```
+
+### Gateway mode for standalone deployments
+
+For a VPS running a single agent, set `gateway.mode: "local"`. Without this, you may need `--allow-unconfigured` on every start.
+
+### Discord `requireMention`
+
+If you want the bot to respond to every message in a channel (not just @mentions), set `requireMention: false` in the guild config:
+
+```json
+{
+  "channels": {
+    "discord": {
+      "guilds": {
+        "YOUR_GUILD_ID": {
+          "requireMention": false
+        }
+      }
+    }
+  }
+}
+```
+
+### Prevention
+
+- Never edit `openclaw.json` from inside the agent if you can avoid it. A config error = instant crash = you can't fix it yourself.
+- Keep a backup: `cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.backup` before any change.
+- If using Claude Code or another external tool for config changes, always verify with `openclaw config get` after editing.
+
+---
+
 ## 16. Skill Security — External Skill Auditing
 
 Skills from external sources (ClawHub, GitHub, any URL) can contain prompt injection. If you read a malicious SKILL.md, the injected instructions are already in your context — game over. Hidden HTML comments, obfuscated instructions, credential exfiltration commands — all invisible in rendered markdown but active when you read the raw file.
