@@ -439,6 +439,161 @@ YouTube Research   →  Search videos, extract comments, get transcripts
 
 ---
 
+## 8b. Knowledge Lives in Skills — The Knowledge→Skills System
+
+Projects are temporary work containers. They start, produce value, and eventually close. Skills are permanent knowledge. A skill captures what you *learned* — the patterns, techniques, gotchas, and workflows that apply beyond any single project.
+
+**The problem this solves:** Without this system, knowledge gets trapped in project folders. When the project closes and gets archived, everything learned goes with it. The next time you face a similar problem, you start from scratch.
+
+**The rule:** Every project must feed a skill. Every skill must reference the project(s) it was born from.
+
+### How It Works
+
+1. **When starting a new project:** Check if a related skill exists. If not, create one. If one exists, link to it in the project ROADMAP.md.
+2. **When learning something during work** — a gotcha, a technique, an API pattern, a failure mode — update the related skill immediately. Don't wait until the project closes.
+3. **Every project ROADMAP.md** must have a `Related Skill:` field pointing to its knowledge skill.
+4. **Every skill** must reference the project(s) it was born from.
+5. **Skills self-improve:** After every execution, evaluate what worked and what didn't. Update the skill.
+
+### Why This Architecture
+
+A fresh session doesn't know what you learned last week — unless it's in a skill. Skills are the only knowledge that reliably loads into context when relevant. Project files don't auto-load. Memory files decay over time. Skills persist and trigger when the topic comes up.
+
+```
+Project (temporary)              Skill (permanent)
+┌──────────────────┐            ┌──────────────────┐
+│ creative-strategy│───feeds───▶│ system-creative-  │
+│ ROADMAP.md       │            │ strategy/SKILL.md │
+│ Related Skill: ──┼───link────▶│ Born from: ───────┼──link back
+│                  │            │ Lessons Learned:  │
+│ [closes someday] │            │ [grows forever]   │
+└──────────────────┘            └──────────────────┘
+```
+
+### The Skill Creator
+
+Use a `system-skill-creator` skill to standardize skill creation. Every skill should have:
+- **YAML frontmatter** with `name` and `description` (how OpenClaw discovers when to load it)
+- **Clear instructions** for what the skill does and how to execute it
+- **Reference files** in a `references/` subfolder for supporting material
+- **A Self-Improvement section** (see below)
+- **A Lessons Learned section** that grows over time
+
+### Mandatory Self-Improvement Section
+
+Every skill must include a `## Self-Improvement` section. This is not optional — it's how knowledge compounds across sessions instead of getting lost.
+
+```markdown
+## Self-Improvement
+
+After every execution of this skill:
+1. What worked well? What produced the best results?
+2. What failed or was inefficient? What would you do differently?
+3. Are there new patterns, tools, or techniques to add?
+4. Update this SKILL.md with any improvements.
+5. Update `lessons-learned.md` in the references folder.
+```
+
+**Why this matters:** A skill without self-improvement is static documentation. A skill *with* self-improvement is a living system that gets better every time it runs. Over months, the difference is enormous — your skills become deeply tuned to your specific context, tools, and preferences.
+
+### Add to AGENTS.md
+
+Add this under your rules:
+
+```markdown
+### Knowledge Lives in Skills — Always
+Projects are temporary. Skills are permanent. Every piece of reusable knowledge must live in a skill.
+- New project? Check for related skill. Create one if missing.
+- Learned something? Update the related skill immediately.
+- Every project ROADMAP.md has a `Related Skill:` field.
+- Every skill references the project(s) it was born from.
+- Skills self-improve after every execution.
+```
+
+---
+
+## 8c. Sub-Agent Protocols
+
+When you spawn a sub-agent (via `sessions_spawn` or similar), it wakes up in a blank isolated session. It has no knowledge of your workspace structure, your rules, your naming conventions, or your security policies. The only context it gets is what you put in the task description.
+
+**If you don't handle this, sub-agents will write files to random locations, use wrong naming conventions, and potentially leak credentials.**
+
+### Two Types of Sub-Agent Tasks
+
+**Type 1: Research / Analysis (most common)**
+The sub-agent searches, reads, analyzes, and returns results in its response. It does NOT write files. You take the results and file them properly.
+
+```
+Research [topic]. [Specific questions to answer].
+Search using [web_search / specific tools].
+
+DO NOT write any files. Return your complete findings in your response.
+Structure your response as:
+- [whatever structure you need]
+```
+
+**Type 2: Build / Execute (less common, higher risk)**
+The sub-agent needs to create files or modify the workspace. This requires workspace context.
+
+```
+[Task description].
+
+BEFORE doing anything, read this file for workspace context:
+/path/to/SUBAGENT-BOOT.md — Critical rules you must follow
+
+[Specific instructions with EXACT file paths for any output]
+All output files MUST go in: /path/to/projects/[project]/
+```
+
+### Create a SUBAGENT-BOOT.md
+
+A lightweight boot file (under 2,000 tokens) that sub-agents read when they need workspace context. NOT the full AGENTS.md boot sequence — just the critical rules:
+- Folder structure basics (where files go)
+- Naming conventions
+- Security rules (no credentials in files)
+- What NOT to do
+
+### Task Design Checklist
+
+Before spawning, verify your task includes:
+- [ ] **Clear objective** — What should the sub-agent produce?
+- [ ] **Specific tools** — Don't leave it guessing (e.g., "Use web_search")
+- [ ] **Output format** — How should results be structured?
+- [ ] **File handling** — Either "DO NOT write any files" or exact paths
+- [ ] **Scope limits** — What should they NOT do?
+
+### After Completion
+
+1. **Read the result** — Don't just relay it to the user
+2. **Check for orphan files** — Sub-agents may drop files in the workspace root
+3. **Verify quality** — Sub-agent "done" ≠ work is actually done
+4. **File outputs properly** — Save research to the correct project folder
+
+### When to Spawn vs. Do It Yourself
+
+**Spawn when:**
+- You need parallel research (multiple independent searches)
+- The task is self-contained — no back-and-forth needed
+- You want to preserve your context window
+- The task would fill your context with data you don't need to keep
+
+**Do it yourself when:**
+- The task needs workspace context or iterative judgment
+- It's a quick lookup (one search, one file read)
+- File placement matters and you'd spend more time explaining than doing
+
+### Common Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| Task too vague ("research X") | Be specific: what to search, what questions to answer, what format |
+| No file handling instructions | Always specify: "DO NOT write files" or exact output paths |
+| Trusting sub-agent file placement | Always verify after completion |
+| Sending too much context in task | Process large content yourself, send structured instructions |
+| Not checking results | Always read and verify before relaying to user |
+
+---
+
 ## 9. Credentials Convention
 
 Create a `credentials.md` in your workspace root. This is a **reference table** — it lists what keys exist and where they're stored at runtime, NOT the raw secrets themselves (especially if your repo is public).
@@ -734,6 +889,13 @@ After setting everything up, run this audit to catch gaps. You can do this yours
 - [ ] Projects referenced in `MEMORY.md` match actual project folders
 - [ ] Slash commands in `COMMANDS.md` match the list in `AGENTS.md`
 
+### Knowledge→Skills System (Section 8b)
+- [ ] Every project in `projects/` has a `Related Skill:` field in its ROADMAP.md
+- [ ] Every skill references the project(s) it was born from
+- [ ] Every skill has a `## Self-Improvement` section
+- [ ] Every skill has a `## Lessons Learned` section
+- [ ] `SUBAGENT-BOOT.md` exists (if using sub-agents)
+
 ### Config Validation
 - [ ] `openclaw.json` is valid JSON (gateway config.get returns no errors)
 - [ ] Auth works (agent can respond to messages)
@@ -1008,6 +1170,8 @@ When setting up, go in this order:
 6. **Add sections to SOUL.md** from Section 3.
 7. **Add sections to AGENTS.md** from Section 4.
 8. **Apply config settings** — session reset (Section 6), thinking (Section 7), context pruning + heartbeat + TLS (Section 11). All with human approval.
+8b. **Set up Knowledge→Skills system** (Section 8b) — add the rule to AGENTS.md, ensure every project links to a skill, add Self-Improvement sections to all skills.
+8c. **Create SUBAGENT-BOOT.md** (Section 8c) — if you'll use sub-agents, create the lightweight boot file and follow the protocols.
 9. **Install skill security tools** — `skill-audit` and `skill-install` scripts (Section 16). Add the AGENTS.md security rules.
 10. **Install additional skills** from Section 8 (optional, based on needs). Use `skill-install` for any external skills.
 11. **Create credentials.md, WORKSPACE.md, IDEAS.md, TASKS.md.**
