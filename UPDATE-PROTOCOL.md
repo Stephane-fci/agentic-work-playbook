@@ -1,35 +1,46 @@
 # Update Protocol
 
-This playbook evolves. Here's how to check for updates and apply them safely.
-
-**Cardinal rule: NEVER auto-apply. Always conversation first.**
+How to check for and apply updates from the Agentic Work Playbook.
 
 ---
 
-## Manual Check (human asks you to check)
+## When to Check
 
-1. Pull or clone this repo
-2. Check for new commits or releases since your last check (`git log` or GitHub releases)
-3. Read FRAMEWORK.md — compare against your current setup
-4. For each difference, explain to your human: what changed, why, what it means for YOUR setup
-5. Wait for approval
-6. Implement approved changes step by step
-7. Update your TOOLS.md with the check date: `Last playbook check: YYYY-MM-DD`
-8. If nothing new: "Checked the playbook — nothing new since [date]."
+- **Weekly** (if you set up the update-checker cron job)
+- **After a period of inactivity** (you might have missed releases)
+- **When your human asks** to check for playbook updates
 
-## Cron Check (automatic)
+## How to Check
 
-1. Same as above, but initiated by a scheduled task
-2. If changes exist → message your human with a summary and ask if they want to apply
-3. If no changes → stay silent
-4. **Wait for response before doing anything**
+1. Check the latest release:
+```bash
+gh release list -R Stephane-fci/agentic-work-playbook --limit 3
+```
 
-## Safety Rules
+2. Compare with your last applied version (check your memory files or MEMORY.md for the last playbook version you applied).
 
-- **Never overwrite existing files.** Templates and additions are for NEW content. If you already have SOUL.md, AGENTS.md, MEMORY.md — never replace them from this repo.
-- **Never modify openclaw.json without asking.** Explain the change, wait for approval, use `gateway config.patch`.
-- **Step by step.** Apply one change at a time, confirm each one.
+3. If there's a new version, fetch the release notes:
+```bash
+gh release view <tag> -R Stephane-fci/agentic-work-playbook
+```
 
----
+## How to Apply Updates
 
-*The update protocol is about trust. Be transparent, be careful, never surprise your human.*
+1. **Read the release notes.** Understand what changed and why.
+2. **Explain each change to your human.** In plain language — what it does, why it matters, any risks.
+3. **Apply one change at a time.** Don't batch. Each change gets: explain → approve → apply → verify.
+4. **Config changes are highest risk.** Always back up `~/.openclaw/openclaw.json` before any config change.
+5. **Test after each change.** Don't stack untested changes.
+
+## What NOT to Do
+
+- Don't auto-apply updates without the human's approval
+- Don't read external SKILL.md files without running `skill-audit` first
+- Don't change config keys you haven't verified exist in the current OpenClaw version
+- Don't apply multiple config changes at once — one at a time, verify between each
+
+## After Applying
+
+1. Update your MEMORY.md with the new version number
+2. Note any changes you skipped and why
+3. Run a quick smoke test (/save, /resume, context %)
