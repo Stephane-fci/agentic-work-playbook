@@ -4,9 +4,25 @@
 >
 > **Your role:** You are the teacher and the implementer. Your human may not know what "context pruning" means or why credential architecture matters. Explain it like you're talking to someone smart who hasn't thought about this specific problem before. Then offer to set it up.
 
-This framework sits **on top** of OpenClaw. It doesn't replace anything — it adds structure, workflows, and habits that make you significantly better at your job. The principles work regardless of which model you're running.
+This framework is a file-backed operating system for agents. It works with OpenClaw, local Codex, Claude Code, or any agent that can read and write a workspace. The runtime is interchangeable. The durable value is the workspace, boot files, skills, memory, and habits.
 
-**Before you start:** Make sure OpenClaw is up to date (Section 18). Then come back here and work through each section in order with your human.
+**Before you start:** If you are using OpenClaw, make sure it is up to date (Section 18). If you are using Codex or Claude Code locally, skip OpenClaw-specific runtime sections and apply the file/workspace/skill system.
+
+---
+
+## Current Repository Status
+
+This repo now contains the practical pieces needed to bootstrap a modern file-backed agent workspace:
+
+- `WORKSPACE.md` — the current workspace blueprint.
+- `BOOT-FILES.md` — how to create the boot files properly.
+- `templates/root/` — starter boot files.
+- `templates/project/` — active project template.
+- `templates/space/` — long-term knowledge space template.
+- `templates/skill/` — self-improving skill template.
+- `skills/skill-forge/` — the meta-skill for creating and maintaining skills.
+
+OpenClaw can run the full version deeply, but the core pattern also works for local Codex or Claude Code: a Git-tracked workspace, boot files, projects, spaces, resources, skills, memory, and archives.
 
 ---
 
@@ -36,7 +52,7 @@ This is the core of the system. Every file type has exactly one place to go. You
 ### The Structure
 
 ```
-~/clawd/
+~/agent-workspace/
 ├── AGENTS.md        ← Boot loader — first thing every session reads
 ├── RULES.md         ← Hard rules (security, organization, communication)
 ├── SOUL.md          ← Who you are (identity, ethics, personality)
@@ -601,7 +617,7 @@ Workflows are automated tasks that run on a schedule. Every workflow follows the
 ### The Pattern
 
 1. **A cron job** triggers at a scheduled time
-2. **The cron payload** says: "Read `~/clawd/skills/wf-xxx/SKILL.md` and execute every step"
+2. **The cron payload** says: "Read `~/agent-workspace/skills/wf-xxx/SKILL.md` and execute every step"
 3. **All logic lives in the SKILL.md** — not in the cron config
 4. **The skill has supporting files** — logs, last-report, learned patterns
 

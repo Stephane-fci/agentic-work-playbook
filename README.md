@@ -1,8 +1,8 @@
 # Agentic Work Playbook
 
-A framework that sits on top of [OpenClaw](https://github.com/openclaw/openclaw) to make any AI agent more effective. It adds workspace architecture, workflows, security, and habits that OpenClaw doesn't provide out of the box.
+A file-backed operating system for AI agents. It works with OpenClaw, Codex, Claude Code, or any agent that can read and write a local workspace.
 
-**This is additive.** It doesn't replace anything — it adds to what's already there.
+It gives the agent durable memory, clean workspace structure, reusable skills, boot-file templates, safety rules, and maintenance habits.
 
 ---
 
@@ -14,7 +14,7 @@ A framework that sits on top of [OpenClaw](https://github.com/openclaw/openclaw)
 
 **Follow this exact process:**
 
-1. **Update OpenClaw first.** Check your version (`openclaw --version`), compare with latest (`npm view openclaw version`). If outdated, explain and update with approval. (Details: FRAMEWORK.md Section 18)
+1. **Identify the runtime first.** If this is OpenClaw, check/update OpenClaw with approval. If this is local Codex or Claude Code, skip OpenClaw-specific sections and focus on the file workspace, boot files, skills, Git, and local tools.
 
 2. **Walk through FRAMEWORK.md section by section.** For each section:
    - **Explain** what it does and why it matters — in plain language
@@ -44,19 +44,26 @@ Read `UPDATE-PROTOCOL.md`, then check for new commits or releases since your las
 
 ## What's in this repo
 
-| File | What it is |
+| Path | What it is |
 |------|-----------|
-| `FRAMEWORK.md` | The complete playbook — 25 sections with instructions, config, and patterns |
-| `UPDATE-PROTOCOL.md` | How to check for and apply updates safely |
-| `scripts/skill-audit` | Security scanner for external skills (bash, regex-based) |
-| `scripts/skill-install` | Helper for quarantine/approve/reject workflow |
+| `FRAMEWORK.md` | The long-form playbook with setup philosophy and operating patterns |
+| `WORKSPACE.md` | Current workspace blueprint: root files, spaces, projects, resources, skills, memory, archives |
+| `BOOT-FILES.md` | How to create proper boot files for a fresh agent |
+| `templates/root/` | Starter boot files: AGENTS, SOUL, IDENTITY, RULES, USER, WORKSPACE, TOOLS, MEMORY, SKILLS, HEARTBEAT |
+| `templates/project/` | Project template with required ROADMAP.md |
+| `templates/space/` | Space template with INDEX, ROADMAP, MEMORY |
+| `templates/skill/` | Standard self-improving skill structure |
+| `skills/skill-forge/` | Meta-skill for creating, improving, and auditing skills |
 | `skills/pil-diagrams/` | Visual diagram generation skill (Python PIL) |
+| `UPDATE-PROTOCOL.md` | How to check for and apply updates safely |
+| `scripts/skill-audit` | Security scanner for external skills |
+| `scripts/skill-install` | Helper for quarantine/approve/reject workflow |
 
 ---
 
-## What's new in v2.0.0
+## What's new in v2.1.0
 
-Major rewrite based on months of production experience:
+Updated to match the current production workspace pattern:
 
 - **New workspace architecture** — `spaces/` for domain knowledge, `resources/` for reference material, `archives/` for history, proper credential isolation with `TOOLS.md`
 - **Skill prefix system** — `wf-*` (workflows), `cd-*` (commands), `system-*` (knowledge), `ext-*` (imports)
@@ -68,6 +75,13 @@ Major rewrite based on months of production experience:
 - **Sub-agent protocols** — task design, SUBAGENT-BOOT.md, research vs build patterns
 - **Workspace hygiene** — automated daily cleanup, weekly memory reflection, git backup
 - **20+ slash commands** — from essential (/save, /resume) to advanced (/atomic, /gsd, /process)
+- **Root templates added** — starter files for AGENTS, SOUL, IDENTITY, RULES, USER, WORKSPACE, TOOLS, MEMORY, SKILLS, and HEARTBEAT
+- **Boot-file guide added** — how to build an agent brain properly instead of dumping random instructions into one file
+- **Project and space templates added** — every active project gets ROADMAP.md; every long-term space gets INDEX, ROADMAP, and MEMORY
+- **Skill template added** — SKILL, CONTEXT, LEARNINGS, LOGS pattern for self-improving skills
+- **Skill Forge included** — portable meta-skill for creating and maintaining skills
+- **Model-agnostic framing** — works for local Codex and Claude Code setups, not only OpenClaw
+
 
 ---
 

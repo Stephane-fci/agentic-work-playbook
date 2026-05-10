@@ -54,7 +54,7 @@ fi
 if [ "$1" = "--all-custom" ]; then
   echo -e "${BOLD}Scanning custom skills (trusted mode)...${NC}"
   PASS=0; WARN=0; FAIL=0
-  for dir in /root/clawd/skills/*/ /root/.openclaw/skills/*/; do
+  for dir in "${AGENT_WORKSPACE:-$PWD}"/skills/*/ "$HOME/.openclaw/skills"/*/; do
     [ -d "$dir" ] || continue
     result=$(skill-audit --trusted "$dir" 2>&1) || true
     echo "$result"

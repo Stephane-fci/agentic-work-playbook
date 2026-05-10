@@ -297,13 +297,13 @@ img.save('/tmp/comparison.png', 'PNG')
 After generating the PNG, send it using the message tool:
 
 ```python
-img.save('/root/clawd/projects/my-project/diagram.png', 'PNG')
+img.save('projects/my-project/diagram.png', 'PNG')
 ```
 
 Then:
 ```
 message(action="send", channel="discord", target="CHANNEL_ID", 
-        message="Here's the diagram:", filePath="/root/clawd/projects/my-project/diagram.png")
+        message="Here's the diagram:", filePath="projects/my-project/diagram.png")
 ```
 
 ## Helper Script

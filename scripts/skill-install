@@ -160,11 +160,11 @@ cmd_download() {
   if echo "$result" | grep -q "PASS"; then
     echo -e "${GREEN}Ready to install. Run: skill-install --approve $name${NC}"
   elif echo "$result" | grep -q "WARN"; then
-    echo -e "${YELLOW}⚠️  Warnings found. Review with Stephane before installing.${NC}"
+    echo -e "${YELLOW}⚠️  Warnings found. Review with the workspace owner before installing.${NC}"
     echo -e "  Approve: skill-install --approve $name"
     echo -e "  Reject:  skill-install --reject $name"
   else
-    echo -e "${RED}🚫 FAILED audit. Do NOT install without Stephane's explicit approval.${NC}"
+    echo -e "${RED}🚫 FAILED audit. Do NOT install without the workspace owner's explicit approval.${NC}"
     echo -e "  Reject:  skill-install --reject $name"
   fi
 }
