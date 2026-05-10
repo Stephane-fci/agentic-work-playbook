@@ -13,6 +13,7 @@ Updated the repo to reflect the current production Agentic Work pattern.
 - `templates/space/` with `INDEX.md`, `ROADMAP.md`, and `MEMORY.md`.
 - `templates/skill/` with `SKILL.md`, `CONTEXT.md`, `LEARNINGS.md`, and `LOGS.md`.
 - `skills/skill-forge/` as a portable meta-skill for creating and maintaining skills.
+- `skills/cd-save/` as a portable end-of-session save command.
 
 ### Changed
 

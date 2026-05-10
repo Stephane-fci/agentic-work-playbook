@@ -54,6 +54,7 @@ Read `UPDATE-PROTOCOL.md`, then check for new commits or releases since your las
 | `templates/space/` | Space template with INDEX, ROADMAP, MEMORY |
 | `templates/skill/` | Standard self-improving skill structure |
 | `skills/skill-forge/` | Meta-skill for creating, improving, and auditing skills |
+| `skills/cd-save/` | End-of-session save command and handoff workflow |
 | `skills/pil-diagrams/` | Visual diagram generation skill (Python PIL) |
 | `UPDATE-PROTOCOL.md` | How to check for and apply updates safely |
 | `scripts/skill-audit` | Security scanner for external skills |
@@ -80,6 +81,7 @@ Updated to match the current production workspace pattern:
 - **Project and space templates added** — every active project gets ROADMAP.md; every long-term space gets INDEX, ROADMAP, and MEMORY
 - **Skill template added** — SKILL, CONTEXT, LEARNINGS, LOGS pattern for self-improving skills
 - **Skill Forge included** — portable meta-skill for creating and maintaining skills
+- **cd-save included** — portable end-of-session save and resume-handoff workflow
 - **Model-agnostic framing** — works for local Codex and Claude Code setups, not only OpenClaw
 
 
