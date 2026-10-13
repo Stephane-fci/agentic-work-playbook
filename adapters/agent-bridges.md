@@ -54,6 +54,15 @@ The bridge's settings live in `/etc/agent-bridges/<instance>/config.json`, chang
 
 And when the workspace holds the other engine's own file: a Codex bridge in a workspace that also has a `CLAUDE.md` for Claude Code takes `"except": ["CLAUDE.md"]`. One agent alone in its workspace needs no `except`.
 
+## Two agents in one workspace
+
+Each engine reads one instruction file by itself, before the bridge adds anything: Claude Code reads `CLAUDE.md`; Codex reads `AGENTS.override.md` when the folder has one, and `AGENTS.md` otherwise, never both. The bridge's `except` setting only filters the files the bridge adds. It cannot stop an engine from reading its own file. So when a second agent joins a workspace whose `AGENTS.md` belongs to the first agent, set it up this way:
+
+- **Claude Code beside it.** Claude Code's own file is `CLAUDE.md`, written for Claude Code, with the full engine connection and no import line for the other agent's files. Its bridge leaves out the other agent's files: `"except": ["AGENTS.md", "AGENTS.override.md", "SOUL.md", "IDENTITY.md"]`.
+- **Codex beside it.** Give Codex its own `AGENTS.override.md`: Codex then reads that file instead of the other agent's `AGENTS.md`. Its bridge leaves out everything that belongs to the others: `"except": ["AGENTS.md", "CLAUDE.md", "SOUL.md", "IDENTITY.md"]`. The other agent's bridge, if it is Claude Code, leaves out `AGENTS.override.md` in turn.
+
+Never rewrite the first agent's `AGENTS.md` for the newcomer: that changes the first agent's own instructions. One limit: `AGENTS.override.md` applies to every Codex that works in that folder, so a workspace can hold one Codex identity this way, not two different ones.
+
 A change to `config.json` (other than who may talk to the bot) applies at the bridge's next start: its daily quiet restart, or a quiet restart you ask for (`docs/updating.md` in the bridge's repository). A change to the boot files themselves needs no restart.
 
 ## Upkeep jobs

@@ -22,7 +22,7 @@ Run the read-only script from the guide's folder: `bash checks/check-workspace.s
 
 This proves the agent receives every boot file in full, fresh at every turn. The idea: put two secret check lines in each boot file, one in the middle and one at the end, then ask the agent to quote them all without opening any file. A file cut short usually loses its middle or its end, so both lines arriving shows the whole file arrived.
 
-1. Make sure the boot files have no unsaved changes in Git (`git status`). The check is undone at the end by putting them back exactly as they are now.
+1. Put a copy of the boot files aside, exactly as they are now: `mkdir -p .playbook/check && cp *.md .playbook/check/`. The check is undone at the end from this copy, so it works even in the middle of a setup or an update, before anything is committed.
 2. At the top of the workspace, add the check lines without showing the codes:
 
 ```bash
@@ -35,11 +35,11 @@ done
 
    The command prints nothing, so the codes exist only in the files. That is what makes the test fair, even when the agent itself runs it.
 3. Start a fresh turn. With Agent Bridges, simply send the next message. Without the bridge, start a new session first, because the engine reads the files only when a session starts ([adapters/claude-code.md](../adapters/claude-code.md), [adapters/codex.md](../adapters/codex.md)).
-4. Ask: "Without opening any file, quote both check lines of every boot file you received, with the file name." Watch the turn. If the agent opens or searches a file, the codes are spoiled: put the files back (`git checkout -- *.md`), add new codes with step 2, and ask again in a new turn.
+4. Ask: "Without opening any file, quote both check lines of every boot file you received, with the file name." Watch the turn. If the agent opens or searches a file, the codes are spoiled: put the files back from the copy (`cp .playbook/check/*.md .`), add new codes with step 2, and ask again in a new turn.
 5. Compare the answer with the real lines, which `grep -h "^Check line" *.md` prints. The step passes when every expected file is quoted with both exact codes, no code is invented, and no file left out on purpose appears.
 6. Look at the sending side too. With Agent Bridges, its doctor must list every boot file and report none left out ([adapters/agent-bridges.md](../adapters/agent-bridges.md)). On Codex with the hook, the hook's output must hold each file whole ([adapters/codex.md](../adapters/codex.md)). The codes prove what the agent received; this proves nothing was cut on the way.
 7. Prove the files are fresh. Add a new end line to one file only, with the `printf` line of step 2 limited to that file, for example `USER.md`. In the same conversation, ask again for that file's last check line. With Agent Bridges, the new code must appear at the next message. Without the bridge, in an interactive session the old code is expected until a new session starts: write that down as a known limit of the setup. A print call (`claude -p`, even with `--resume`) is a new process that loads the files again, so it shows the new code at once; that is normal, not a failure.
-8. Put the boot files back: `git checkout -- *.md`. Then `git diff` on the boot files must show nothing.
+8. Put the boot files back from the copy and remove it: `cp .playbook/check/*.md . && for f in .playbook/check/*.md; do cmp -s "$f" "$(basename "$f")" || echo "differs: $f"; done && rm -rf .playbook/check`. Nothing may print, and no `Check line` may be left: `grep -l "^Check line" *.md` prints nothing.
 
 What to tell your person: "I put secret codes in the middle and at the end of each of my instruction files and asked myself to quote them without looking. Every code came back, so I really receive all my instructions, fresh at every message."
 

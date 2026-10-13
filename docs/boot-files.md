@@ -34,7 +34,7 @@ The same method serves three kinds of agent. Choose one before writing the files
 
 **Specialist.** An agent with one job, such as answering customers. It keeps the same file names, each with the same purpose, but writes them for its one job and may replace the shared method files with shorter versions of its own. It often adds `INTENT.md` (its mission and how it decides) and, when it talks to customers, `BRAND.md` (its voice with them). Its spaces hold current facts only.
 
-Any profile can run as a second operator: an engine that works beside an agent that already exists, in that agent's workspace. It shares the owner's files and the method, but not the other agent's identity. Its bridge leaves out that agent's `SOUL.md`, `IDENTITY.md` and own engine file, and its `CLAUDE.md` or `AGENTS.md` says plainly that it is not that agent.
+Any profile can run as a second operator: an engine that works beside an agent that already exists, in that agent's workspace. It shares the owner's files and the method, but not the other agent's identity. Its bridge leaves out that agent's `SOUL.md` and `IDENTITY.md`, and its own instruction file says plainly that it is not that agent. The engine's own instruction file needs care, because the engine reads it by itself, not through the bridge, so the bridge's `except` setting cannot keep it away: [Two agents in one workspace](../adapters/agent-bridges.md#two-agents-in-one-workspace) gives the setup for Claude Code and for Codex.
 
 ## Writing boot files well
 

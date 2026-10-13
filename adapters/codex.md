@@ -54,7 +54,7 @@ Then `.codex/hooks/boot_files.py`, which prints every top-level Markdown file an
 import datetime, json, pathlib
 
 root = pathlib.Path(__file__).resolve().parents[2]
-skip = {"AGENTS.md", "CLAUDE.md"}  # Codex reads AGENTS.md itself; CLAUDE.md belongs to Claude Code
+skip = {"AGENTS.md", "AGENTS.override.md", "CLAUDE.md"}  # Codex reads its own file itself; CLAUDE.md belongs to Claude Code
 parts = []
 for path in sorted(root.glob("*.md")):
     if path.name not in skip and not path.name.startswith("."):
