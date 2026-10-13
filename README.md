@@ -1,96 +1,73 @@
 # Agentic Work Playbook
 
-A file-backed operating system for AI agents. It works with OpenClaw, Codex, Claude Code, or any agent that can read and write a local workspace.
+This guide teaches an AI agent how to work for you: where it keeps what it learns, which instruction files it reads at every message, how its workspace stays tidy, and how to prove it all works. You give the guide to your agent, and the agent sets itself up, explaining each step to you in plain words as it goes.
 
-It gives the agent durable memory, clean workspace structure, reusable skills, boot-file templates, safety rules, and maintenance habits.
+## What you get
 
----
+- An agent that remembers. Decisions and work in progress live in plain text files, so a new conversation picks up where the last one stopped.
+- A tidy workspace: one place for each kind of thing, from what the agent knows about your business to its daily diary.
+- Instruction files written for you: who you are, how you work, what the agent may do on its own, and its tools.
+- Background jobs that tidy, save and back up the workspace every night, so you never have to say "save".
+- A final check with real proof of what works, not the agent's word for it.
+- Optional: a simple way to name Discord channels, so you see at a glance what each one is about.
 
-## ⚠️ For Agents: How to Use This Repo
+It works for your own assistant, a team assistant, or a specialist with one job.
 
-**Do NOT just read this repo and move on.** This is a guided setup process. Your job is to walk your human through every step, explain what each setting does, and implement changes together.
+## What you need
 
-### If your human says "apply this playbook" or "set up from this repo":
+- An AI agent running on Claude Code or Codex. The engine is the program that runs the AI model and lets it work with files and tools.
+- Ideally, Agent Bridges in front of it: you talk to the agent in Discord or Slack, and it receives all its instruction files fresh at every message ([adapters/agent-bridges.md](adapters/agent-bridges.md)). Without it the guide still works, but a changed instruction file counts only from the next new conversation.
+- A folder for the agent's workspace, on a computer or a server where the agent runs. A workspace already in use is fine: the agent completes it and never overwrites your own files.
+- For the nightly backup, a private online copy of that folder that you own, such as a private GitHub repository. The agent helps you make it.
 
-**Follow this exact process:**
+## The one sentence to give your agent
 
-1. **Identify the runtime first.** If this is OpenClaw, check/update OpenClaw with approval. If this is local Codex or Claude Code, skip OpenClaw-specific sections and focus on the file workspace, boot files, skills, Git, and local tools.
+```text
+Read START-HERE.md in https://github.com/Stephane-fci/agentic-work-playbook and set yourself up.
+```
 
-2. **Walk through FRAMEWORK.md section by section.** For each section:
-   - **Explain** what it does and why it matters — in plain language
-   - **Ask** if they want to implement it
-   - **Apply** the setting or create the files
-   - **Confirm** it works before moving to the next section
+Send the link, not a zip file by email: mail servers often block zip files that contain scripts.
 
-3. **The sections cover:**
-   - §1-4: Foundation (philosophy, workspace structure, root files, credentials)
-   - §5-9: Identity & memory (SOUL.md, IDENTITY.md, USER.md, RULES.md, AGENTS.md)
-   - §10-14: Skills & automation (skill system, commands, knowledge→skills, sub-agents, workflows)
-   - §15-17: Context & config (context management, session settings, config gotchas)
-   - §18-23: Operations (updates, security, hygiene, recovery, config audits, user manual)
-   - §24-25: Verification (post-setup audit, implementation order)
+The agent reads the guide, looks at what you have, and asks one short set of questions only you can answer. On a workspace already in use, it shows you the list of changes and waits for your yes. Then it sets itself up, tests itself and reports what works, what was not checked, and the next action.
 
-4. **After completing all sections**, run the post-setup audit (§24) to verify everything.
+## How long it takes
 
-**Key principle: never auto-apply anything.** Explain every change, wait for approval, apply one at a time.
+Plan for an afternoon for the core setup. The agent does the work; your part is about an hour: answering the questions, saying yes to the changes and reading the report. The final check alone takes about half an hour ([docs/verify.md](docs/verify.md)).
 
----
+Connecting your tools and proving each background job with a real run often takes a few more days; the report says plainly what is still open. Get the agent running and reachable first: setups stall when the server, the chat connection and this guide are all done at once.
 
-## If you're an existing agent checking for updates
+## What this guide is not
 
-Read `UPDATE-PROTOCOL.md`, then check for new commits or releases since your last check.
+It sets up how the agent works, not the things around it. Each of these is a separate product:
 
----
+- The server: buying, securing and maintaining it. The author's separate guide: https://github.com/Stephane-fci/vps-hardening-playbook
+- The chat connection: installing Agent Bridges and its Discord bot, which has its own install guide.
+- A permission system that controls what each member of a team may ask the agent.
+- Skill Forge, a skill that creates, audits and retires skills once the library grows. The skill method in this guide works without it.
 
-## What's in this repo
+It does not install Claude Code or Codex, and it does not create your accounts or logins.
 
-| Path | What it is |
-|------|-----------|
-| `FRAMEWORK.md` | The long-form playbook with setup philosophy and operating patterns |
-| `WORKSPACE.md` | Current workspace blueprint: root files, spaces, projects, resources, skills, memory, archives |
-| `BOOT-FILES.md` | How to create proper boot files for a fresh agent |
-| `templates/root/` | Starter boot files: AGENTS, SOUL, IDENTITY, RULES, USER, WORKSPACE, TOOLS, MEMORY, SKILLS, HEARTBEAT |
-| `templates/project/` | Project template with required ROADMAP.md |
-| `templates/space/` | Space template with INDEX, ROADMAP, MEMORY |
-| `templates/skill/` | Standard self-improving skill structure |
-| `skills/skill-forge/` | Meta-skill for creating, improving, and auditing skills |
-| `skills/cd-save/` | End-of-session save command and handoff workflow |
-| `skills/pil-diagrams/` | Visual diagram generation skill (Python PIL) |
-| `UPDATE-PROTOCOL.md` | How to check for and apply updates safely |
-| `scripts/skill-audit` | Security scanner for external skills |
-| `scripts/skill-install` | Helper for quarantine/approve/reject workflow |
+## The guide's files
 
----
+- [START-HERE.md](START-HERE.md): the setup, for your agent.
+- [docs/way-of-working.md](docs/way-of-working.md): the method and why.
+- [docs/workspace.md](docs/workspace.md): the folders, and what goes where.
+- [docs/boot-files.md](docs/boot-files.md): every instruction file.
+- [docs/skills.md](docs/skills.md): the agent's reusable abilities.
+- [docs/upkeep.md](docs/upkeep.md): the background jobs and commands.
+- [docs/discord.md](docs/discord.md): optional, naming Discord channels.
+- [docs/verify.md](docs/verify.md): the final check.
+- [docs/update.md](docs/update.md): moving to a new version safely.
+- [adapters/](adapters/): Agent Bridges, Claude Code, Codex, and existing OpenClaw agents.
+- [templates/](templates/): the starting files.
+- Examples: [examples/personal-assistant/](examples/personal-assistant/) and [examples/team-assistant/README.md](examples/team-assistant/README.md), both fictional, and [examples/reference-workspace.md](examples/reference-workspace.md), the shape of the author's own workspace.
+- [checks/](checks/): a read-only structure check.
+- [CHANGELOG.md](CHANGELOG.md): what changed, and why.
 
-## What's new in v2.1.0
+To update later, tell your agent: "Update the playbook by following docs/update.md."
 
-Updated to match the current production workspace pattern:
+## Author and version
 
-- **New workspace architecture** — `spaces/` for domain knowledge, `resources/` for reference material, `archives/` for history, proper credential isolation with `TOOLS.md`
-- **Skill prefix system** — `wf-*` (workflows), `cd-*` (commands), `system-*` (knowledge), `ext-*` (imports)
-- **Credential architecture** — TOOLS.md as service catalog, credential lifecycle (save→verify→delete message), permission tiers
-- **Workflow architecture** — cron jobs + SKILL.md pattern, self-learning workflows, recommended starter automations
-- **Context management reality** — actual limits vs advertised, thinking+compaction gotcha, save thresholds
-- **Expanded config gotchas** — auth profiles, OAuth providers, signal handling, every known crash trigger
-- **Knowledge→Skills system** — projects are temporary, skills are permanent, mandatory self-improvement
-- **Sub-agent protocols** — task design, SUBAGENT-BOOT.md, research vs build patterns
-- **Workspace hygiene** — automated daily cleanup, weekly memory reflection, git backup
-- **20+ slash commands** — from essential (/save, /resume) to advanced (/atomic, /gsd, /process)
-- **Root templates added** — starter files for AGENTS, SOUL, IDENTITY, RULES, USER, WORKSPACE, TOOLS, MEMORY, SKILLS, and HEARTBEAT
-- **Boot-file guide added** — how to build an agent brain properly instead of dumping random instructions into one file
-- **Project and space templates added** — every active project gets ROADMAP.md; every long-term space gets INDEX, ROADMAP, and MEMORY
-- **Skill template added** — SKILL, CONTEXT, LEARNINGS, LOGS pattern for self-improving skills
-- **Skill Forge included** — portable meta-skill for creating and maintaining skills
-- **cd-save included** — portable end-of-session save and resume-handoff workflow
-- **Model-agnostic framing** — works for local Codex and Claude Code setups, not only OpenClaw
+Written by Stephane Franceschini (Steph France), from how he works with his own agents every day: https://www.youtube.com/@steph_france
 
-
----
-
-## Philosophy
-
-Every pattern in this playbook exists because skipping it caused real problems. Nothing is theoretical — it's all battle-tested.
-
-The core insight: **an AI agent's workspace IS its brain.** If the workspace is messy, the agent is confused. If files are in the wrong place, the agent can't find them. If there's dead information, the agent trusts outdated facts.
-
-Structure your workspace well, and your agent becomes dramatically more capable — not because the model changed, but because the context it loads is clean, current, and organized.
+The current version is the one line in [VERSION](VERSION).

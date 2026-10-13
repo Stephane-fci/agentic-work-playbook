@@ -135,6 +135,24 @@ if [ -f AGENTS.md ] && [ "$(file_size AGENTS.md)" -gt 32768 ]; then
   warn "AGENTS.md is larger than 32 KB. Codex without Agent Bridges stops reading project instructions at 32 KB (see adapters/codex.md)."
 fi
 note "$boot_count boot files, about $(( (boot_bytes + 1023) / 1024 )) KB in total."
+unfilled=""
+unknowns=""
+for path in *.md; do
+  [ -f "$path" ] || continue
+  # A template note or a {placeholder} outside code blocks means the file was never filled in.
+  if awk '/^```/{c=!c; next} !c { line=$0; gsub(/\{unknown[^}]*\}/, "", line); if (line ~ /^\{Template:/ || line ~ /\{[A-Za-z][^}]*\}/) found=1 } END{exit found?0:1}' "$path"; then
+    unfilled="$unfilled $path"
+  fi
+  if grep -q '{unknown' "$path"; then unknowns="$unknowns $path"; fi
+done
+if [ -n "$unknowns" ]; then
+  warn "facts marked {unknown: ask} in:$unknowns. Ask the person when it helps; an honest unknown is better than a guess."
+fi
+if [ -n "$unfilled" ]; then
+  fix "not filled in yet (a template note or a {placeholder} is left):$unfilled. Fill each one for this agent and its person, and delete the template notes (docs/boot-files.md)."
+else
+  pass "every boot file is filled in (no template note or {placeholder} left)"
+fi
 
 # ---------------------------------------------------------------- top of the workspace
 section "Top of the workspace (boot files only)"
