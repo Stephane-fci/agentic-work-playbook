@@ -1,3 +1,3 @@
-# Logs
+# Logs: {skill-name}
 
-Execution history.
+Run history. Append one dated entry after every run: what started it, what was done, the outcome.

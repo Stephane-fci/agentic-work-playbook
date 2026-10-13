@@ -1,19 +1,13 @@
-# MEMORY.md — Current State
+# Live board, {date}
 
-Keep this file small. It is the current working memory, not the full history.
+{Template: this board is rebuilt whole every night from the newest daily file, never patched line by line. It stays under 2,500 characters. One line per project worked on recently; nothing older, no history, no padding. Delete this line when done.}
 
-## Current priorities
+Today: `memory/{YYYY-MM-DD}.md`. Yesterday: `memory/{YYYY-MM-DD}.md`. Other days: `memory/YYYY-MM-DD.md`, older ones in `memory/archive/YYYY-MM/`.
 
-- TODO
+## Active work
 
-## Active threads
+- {Project}: {what happened last}; {what is next}.
 
-- TODO
+## Standing gates
 
-## Recent decisions
-
-- TODO
-
-## Blockers
-
-- TODO
+{The few limits on current work, such as a decision waiting on {person} or a system that must not change. Write "None." when there are none.}

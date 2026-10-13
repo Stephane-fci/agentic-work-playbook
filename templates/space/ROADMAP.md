@@ -1,17 +1,19 @@
-# Space Name — Roadmap
+# {Space name}: roadmap
 
-## Current priorities
+{Template: the priorities of this area, kept short and current. Bounded work gets its own project; this page points to it. Delete this line when done.}
 
-- TODO
+## Now
 
-## Active questions
+- {A current priority, and the project that carries it if there is one.}
 
-- TODO
+## Waiting
 
-## Systems / recurring work
+- {What waits on whom.}
 
-- TODO
+## Next
 
-## Next step
+- {The next step for this area.}
 
-TODO
+## Later
+
+- {Ideas not started yet.}
