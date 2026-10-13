@@ -70,5 +70,5 @@ On Windows, making a link needs Developer Mode or an administrator window. A cha
 ### 6. Check
 
 1. In a session, run `/context` and look at the list under "Memory files": `CLAUDE.md` and every imported file must be there. `/memory` also lists the instruction files. Source: https://code.claude.com/docs/en/memory
-2. Start a new session and run the loading check in [verify](../docs/verify.md): the agent quotes every boot file's unique last line without opening a file.
+2. Start a new session and run the loading check in [verify](../docs/verify.md): the agent quotes every boot file's two secret check lines without opening a file.
 3. Edit one of those last lines and ask again in the same interactive session: expect the old line. Start a new session and ask again: expect the new one. This shows your person the limit from step 3 in plain terms. A print call (`claude -p`, even with `--resume`) loads the files again each time, so it shows the new line at once.

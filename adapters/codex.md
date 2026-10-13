@@ -101,5 +101,5 @@ Run each job once by hand with the same command and check its commit and push be
 
 1. Run `/status` in Codex: it lists the `AGENTS.md` files in use. Source: https://github.com/openai/codex/pull/40502
 2. Run `/hooks`: the boot-file hook is trusted and switched on.
-3. Start a new session and run the loading check in [verify](../docs/verify.md): the agent quotes every boot file's unique last line without opening a file. A last line missing from a long file means the hook's limit cut it: raise `additionalContextLimit`.
+3. Start a new session and run the loading check in [verify](../docs/verify.md): the agent quotes every boot file's two secret check lines without opening a file. A last line missing from a long file means the hook's limit cut it: raise `additionalContextLimit`.
 4. Edit one of those last lines and ask again in the same session: expect the old line. Start a new session and ask again: expect the new one. This shows your person the limit of this route in plain terms.

@@ -14,7 +14,7 @@ The guide's version is separate from the versions of Agent Bridges and of the en
 
 The workspace keeps one record of what the guide installed: `.playbook/installed.json`. It sits in a hidden folder at the top of the workspace, so it is never read as a boot file. The agent writes it at the last step of [START-HERE.md](../START-HERE.md), rewrites it after each update, and commits it with the workspace.
 
-It holds the guide version, the dates, and every file the guide installed, each with its class and its hash. A hash is a short fingerprint of a file's content: change one character and the fingerprint changes. Get it with `sha256sum FILE` on Linux or `shasum -a 256 FILE` on a Mac. The recorded hash is always the fingerprint of the guide's own file at the installed version (its `source`).
+It holds the guide version, the dates, the result of the last check (`pending` while the checks run, then `passed`, or `partial` when some could not be checked), and every file the guide installed, each with its class and its hash. A hash is a short fingerprint of a file's content: change one character and the fingerprint changes. Get it with `sha256sum FILE` on Linux or `shasum -a 256 FILE` on a Mac. The recorded hash is always the fingerprint of the guide's own file at the installed version (its `source`).
 
 A fictional example, with the hashes shortened:
 
@@ -24,6 +24,7 @@ A fictional example, with the hashes shortened:
   "version": "3.0.0",
   "installed": "2026-10-20",
   "updated": "2026-10-20",
+  "checks": "passed",
   "files": [
     { "path": "WORKSPACE.md", "source": "templates/root/WORKSPACE.md", "class": "shared", "sha256": "9f2c07..." },
     { "path": "OPERATING-MODE.md", "source": "templates/root/OPERATING-MODE.md", "class": "shared", "sha256": "e1a4b2..." },

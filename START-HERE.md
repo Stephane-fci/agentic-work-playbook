@@ -115,16 +115,17 @@ What to tell your person: "Your channels now start with an emoji that says what 
 
 ## Step 9: Run the checks
 
-1. Run `bash checks/check-workspace.sh /path/to/workspace` from the guide's folder ([checks/README.md](checks/README.md)). Fix every line that says FIX and run it again. Read every WARN line. The warning about the missing installed receipt is expected until step 10.
-2. Work through [docs/verify.md](docs/verify.md) in order: the loading check, the six questions, then upkeep and backup. A test that needs a fresh conversation runs in a new one; ask your person to open it when you cannot. Only [real proof](docs/verify.md#what-counts-as-proof) counts.
-3. Look once more for template lines left in boot files (step 5) and jobs not yet proven (step 7).
+1. Write `.playbook/installed.json` as [docs/update.md](docs/update.md#the-installed-receipt) says: the version from [VERSION](VERSION), the date, every file the guide installed with its source, class and hash, and `"checks": "pending"`. The checks below need it.
+2. Run `bash checks/check-workspace.sh /path/to/workspace` from the guide's folder ([checks/README.md](checks/README.md)). Fix every line that says FIX and run it again. Read every WARN line.
+3. Work through [docs/verify.md](docs/verify.md) in order, once: the loading check, the six questions, then upkeep and backup. Question 6 compares only; it never starts this setup or this check again. A test that needs a fresh conversation runs in a new one; ask your person to open it when you cannot. Only [real proof](docs/verify.md#what-counts-as-proof) counts.
+4. Look once more for template lines left in boot files (step 5) and jobs not yet proven (step 7).
 
 What to tell your person: "I tested myself with real checks instead of taking my own word for it. Here is what passed."
 
 ## Step 10: Record and report
 
-1. Write `.playbook/installed.json` as [docs/update.md](docs/update.md#the-installed-receipt) says: the version from [VERSION](VERSION), the date, and every file the guide installed with its source, class and hash.
-2. Run `checks/check-workspace.sh` once more. The receipt line now passes, and no line says FIX.
+1. Set `checks` in `.playbook/installed.json` to `"passed"` when every check of step 9 passed, or to `"partial"` when some were not checked.
+2. Run `checks/check-workspace.sh` once more. No line says FIX.
 3. Commit only the files the setup touched, by exact path.
 4. Write the report in [three parts](docs/verify.md#how-to-report): what works, with its proof; what was not checked, and why; the next action. Save it in the setup project's LOGS.md and set its STATE.md to that next action. When nothing is left, archive the project.
 5. Tell your person how to update later: "Update the playbook by following docs/update.md."

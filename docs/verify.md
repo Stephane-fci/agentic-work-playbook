@@ -20,17 +20,28 @@ Run the read-only script from the guide's folder: `bash checks/check-workspace.s
 
 ## Step 2: the loading check
 
-This proves the agent receives every boot file in full, fresh at every turn. The idea: put a unique, secret last line in each boot file, then ask the agent to quote them all without opening any file. A last line proves the whole file arrived, not only its beginning.
+This proves the agent receives every boot file in full, fresh at every turn. The idea: put two secret check lines in each boot file, one in the middle and one at the end, then ask the agent to quote them all without opening any file. A file cut short usually loses its middle or its end, so both lines arriving shows the whole file arrived.
 
-1. Make sure the boot files have no unsaved changes in Git, so you can see exactly what the check adds.
-2. At the top of the workspace, add a random check line at the end of every boot file without showing the codes, for example: `for f in *.md; do printf '\nCheck line %s: %s\n' "$f" "$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')" >> "$f"; done`. The command prints nothing, so the codes exist only in the files. That is what makes the test fair, even when the agent itself runs the command.
+1. Make sure the boot files have no unsaved changes in Git (`git status`). The check is undone at the end by putting them back exactly as they are now.
+2. At the top of the workspace, add the check lines without showing the codes:
+
+```bash
+for f in *.md; do
+  m=$(( $(wc -l < "$f") / 2 + 1 ))
+  awk -v m="$m" -v f="$f" -v c="$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')" 'NR==m{print "Check line " f " middle: " c} {print}' "$f" > "$f.check" && mv "$f.check" "$f"
+  printf '\nCheck line %s end: %s\n' "$f" "$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')" >> "$f"
+done
+```
+
+   The command prints nothing, so the codes exist only in the files. That is what makes the test fair, even when the agent itself runs it.
 3. Start a fresh turn. With Agent Bridges, simply send the next message. Without the bridge, start a new session first, because the engine reads the files only when a session starts ([adapters/claude-code.md](../adapters/claude-code.md), [adapters/codex.md](../adapters/codex.md)).
-4. Ask: "Without opening any file, quote the last line of every boot file you received, with its file name." Watch the turn. If the agent opens or searches a file to answer, the result does not count: ask again in a new turn.
-5. Compare the answer with the real last lines, which `tail -n 1 *.md` prints. The step passes when every expected file is quoted with its exact code, no code is invented, and no file left out on purpose appears.
-6. Prove the files are fresh. Change one file's last line with the same command limited to that file, for example `USER.md` instead of `*.md`. In the same conversation, ask again for that file's last line. With Agent Bridges, the new code must appear at the next message. Without the bridge, in an interactive session the old code is expected until a new session starts: write that down as a known limit of the setup. A print call (`claude -p`, even with `--resume`) is a new process that loads the files again, so it shows the new code at once; that is normal, not a failure.
-7. Remove every check line, including the empty line added before each one. Then `git diff` on the boot files must show nothing left from the check.
+4. Ask: "Without opening any file, quote both check lines of every boot file you received, with the file name." Watch the turn. If the agent opens or searches a file, the codes are spoiled: put the files back (`git checkout -- *.md`), add new codes with step 2, and ask again in a new turn.
+5. Compare the answer with the real lines, which `grep -h "^Check line" *.md` prints. The step passes when every expected file is quoted with both exact codes, no code is invented, and no file left out on purpose appears.
+6. Look at the sending side too. With Agent Bridges, its doctor must list every boot file and report none left out ([adapters/agent-bridges.md](../adapters/agent-bridges.md)). On Codex with the hook, the hook's output must hold each file whole ([adapters/codex.md](../adapters/codex.md)). The codes prove what the agent received; this proves nothing was cut on the way.
+7. Prove the files are fresh. Add a new end line to one file only, with the `printf` line of step 2 limited to that file, for example `USER.md`. In the same conversation, ask again for that file's last check line. With Agent Bridges, the new code must appear at the next message. Without the bridge, in an interactive session the old code is expected until a new session starts: write that down as a known limit of the setup. A print call (`claude -p`, even with `--resume`) is a new process that loads the files again, so it shows the new code at once; that is normal, not a failure.
+8. Put the boot files back: `git checkout -- *.md`. Then `git diff` on the boot files must show nothing.
 
-What to tell your person: "I put a secret code at the end of each of my instruction files and asked myself to quote them without looking. Every code came back, so I really receive all my instructions, fresh at every message."
+What to tell your person: "I put secret codes in the middle and at the end of each of my instruction files and asked myself to quote them without looking. Every code came back, so I really receive all my instructions, fresh at every message."
 
 ## Step 3: the six questions
 
@@ -60,9 +71,9 @@ Take three channel names built from the emoji legend in RULES.md, one of them wi
 
 ### 6. Can setup and an update be repeated safely?
 
-Run the setup from [START-HERE.md](../START-HERE.md) a second time. It passes when the agent recognizes what is done and changes nothing, or only adds what is missing, with no second copy of an import line, a link or a scheduled job.
+This question only compares: it never starts the setup, an update or this check again, so it cannot run in circles. Go through steps 5 to 7 of [START-HERE.md](../START-HERE.md) a second time and list what each would change, without applying it. It passes when the list is empty, or holds only what is truly missing, with no second copy of an import line, a link or a scheduled job.
 
-Then run the update steps of [update.md](update.md) against the version already installed. They must find nothing to replace and leave every personal file alone. Finally, try the way back that update.md describes on a harmless test commit. It passes when Git shows no change to any personal file and the way back restores the previous state exactly.
+Then do the comparison part of [update.md](update.md) against the receipt, for the version already installed, without applying anything. It must find nothing to replace and leave every personal file alone. Finally, try the way back that update.md describes on a harmless test commit. It passes when Git shows no change to any personal file and the way back restores the previous state exactly.
 
 ## Upkeep and backup, when installed
 

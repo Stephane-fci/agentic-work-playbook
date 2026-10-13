@@ -12,12 +12,12 @@ It needs only bash (version 3.2 or newer) and standard tools that every Linux se
 
 ## What it checks
 
-- Boot files: every required boot file is present and not empty; when CLAUDE.md exists, a root file it does not import is a warning (WORKSPACE.md, OPERATING-MODE.md, COMMUNICATION.md, SOUL.md, IDENTITY.md, USER.md, RULES.md, TOOLS.md, MEMORY.md, SKILLS.md), with at least one engine file (CLAUDE.md or AGENTS.md). Every boot file must be filled in: a template note or a `{placeholder}` left in a file must be fixed, while an honest `{unknown: ask}` is only a warning. Extra boot files are listed, and a file too big for Agent Bridges to deliver is flagged. The specification is in [docs/boot-files.md](../docs/boot-files.md).
+- Boot files: every required boot file is present and not empty; when CLAUDE.md exists, a root file it does not import is a warning (WORKSPACE.md, OPERATING-MODE.md, COMMUNICATION.md, SOUL.md, IDENTITY.md, USER.md, RULES.md, TOOLS.md, MEMORY.md, SKILLS.md), with at least one engine file (CLAUDE.md, AGENTS.md, or Codex's AGENTS.override.md). Every boot file must be filled in: a template note or a `{placeholder}` left in a file must be fixed, while an honest `{unknown: ask}` is only a warning. Extra boot files are listed, and a file too big for Agent Bridges to deliver is flagged. The specification is in [docs/boot-files.md](../docs/boot-files.md).
 - The top of the workspace: boot files only, named in capitals. Any other file there must move; an unknown folder is flagged.
 - Folders: `spaces/`, `projects/`, `resources/`, `skills/`, `memory/` and `archives/` exist. `repositories/` and `dashboards/` are optional.
 - Inside the folders: each space has INDEX.md, each project has README.md, STATE.md and LOGS.md, each resources folder has INDEX.md, `repositories/INDEX.md` names every repository, each dashboard has a README.md, each skill has a SKILL.md with a name and a description (only a warning for a scheduled `wf-` skill) and is listed in SKILLS.md, `memory/` holds daily files named by date, and `archives/` has its DONE-LOG.md. The layout is in [docs/workspace.md](../docs/workspace.md).
 - Secrets: no secret value in any Markdown file. Private keys and known key formats must be fixed. A long value after a word such as "token" or "password" is a warning to look at, because it may be harmless.
-- Records: the installed receipt `.playbook/installed.json` and its version ([docs/update.md](../docs/update.md)), and whether the workspace is a Git repository with a remote copy for backups.
+- Records: the installed receipt `.playbook/installed.json`: valid JSON with the guide, version, dates, check result and every file's path, source, class and full hash (checked with python3 when it is installed), and its version ([docs/update.md](../docs/update.md)), and whether the workspace is a Git repository with a remote copy for backups.
 
 Folders whose names start with `_` are skipped as templates.
 

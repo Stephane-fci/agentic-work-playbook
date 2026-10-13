@@ -58,6 +58,7 @@ in_list() {
 
 # Boot file names are capitals, digits, hyphens or underscores, ending in .md.
 is_boot_name() {
+  [ "$1" = "AGENTS.override.md" ] && return 0
   case "$1" in *.md) ;; *) return 1 ;; esac
   base=${1%.md}
   case "$base" in ''|[!A-Z0-9]*|*[!A-Z0-9_-]*) return 1 ;; esac
@@ -91,7 +92,7 @@ printf 'Paths such as docs/boot-files.md are pages of the guide.\n'
 # ---------------------------------------------------------------- boot files
 section "Boot files (every Markdown file at the top, read at every turn)"
 required_boot="WORKSPACE.md OPERATING-MODE.md COMMUNICATION.md SOUL.md IDENTITY.md USER.md RULES.md TOOLS.md MEMORY.md SKILLS.md"
-engine_files="CLAUDE.md AGENTS.md"
+engine_files="CLAUDE.md AGENTS.md AGENTS.override.md"
 for name in $required_boot; do
   if [ ! -f "$name" ]; then
     fix "$name is missing. Create it from templates/root/$name (see docs/boot-files.md)."
@@ -435,8 +436,38 @@ fi
 # ---------------------------------------------------------------- records
 section "Records"
 if [ -f .playbook/installed.json ]; then
+  receipt_problem=""
+  if command -v python3 >/dev/null 2>&1; then
+    receipt_problem=$(python3 - .playbook/installed.json <<'PYCHECK' 2>&1
+import json, re, sys
+try:
+    r = json.load(open(sys.argv[1]))
+except Exception as e:
+    print("it is not valid JSON"); sys.exit(0)
+problems = []
+if not isinstance(r, dict): print("it is not a JSON object"); sys.exit(0)
+for k in ("guide", "version", "installed", "files"):
+    if k not in r: problems.append("no " + k)
+if r.get("checks") not in (None, "pending", "passed", "partial"): problems.append("checks is not pending, passed or partial")
+files = r.get("files")
+if not isinstance(files, list) or not files: problems.append("no file entries")
+else:
+    for n, f in enumerate(files, 1):
+        if not isinstance(f, dict): problems.append("entry %d is not an object" % n); continue
+        for k in ("path", "source", "class", "sha256"):
+            if not f.get(k): problems.append("entry %d has no %s" % (n, k))
+        if f.get("class") not in (None, "", "shared", "personal", "generated"): problems.append("entry %d has an unknown class" % n)
+        if f.get("sha256") and not re.fullmatch(r"[0-9a-f]{64}", str(f["sha256"])): problems.append("entry %d hash is not a full sha256" % n)
+print("; ".join(problems[:5]) + (" (and more)" if len(problems) > 5 else ""))
+PYCHECK
+)
+  else
+    note "python3 is not installed, so the receipt's fields were not checked, only its version."
+  fi
   installed=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' .playbook/installed.json | head -n 1)
-  if [ -n "$installed" ]; then
+  if [ -n "$receipt_problem" ]; then
+    fix ".playbook/installed.json is not usable: $receipt_problem. Rewrite it as docs/update.md shows."
+  elif [ -n "$installed" ]; then
     pass "installed receipt: version $installed"
     if [ "$guide_version" != "unknown" ] && [ "$installed" != "$guide_version" ]; then
       note "this guide is version $guide_version. To move the workspace to it, follow docs/update.md."
