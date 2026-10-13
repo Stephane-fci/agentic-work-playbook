@@ -4,6 +4,8 @@ This page is optional. Use it if you talk to your agents in Discord. It is a Dis
 
 The connection between Discord and your agent is a separate product. [Agent Bridges](../adapters/agent-bridges.md) is the recommended one: each channel and each thread is one long conversation with the agent.
 
+On the person's side, Discord in the browser can be set up for this way of working with AgentDisc, a Chrome extension by the same author: https://github.com/Stephane-fci/agentdisc. It follows the method on this page: it treats a category and its `Archive N` categories as one family, its new-channel box puts the chosen category's emoji at the start of the name, and one shortcut moves a loose channel into its family's active category. It also shows which agent is typing in which thread. Its feedback mode quotes a piece of the agent's message as *"the quoted text"* >> followed by the person's answer: the agent answers each quote. The method works without it.
+
 ## Channels, threads and tests
 
 A channel is where a topic is talked about. The project's files hold the truth, so decisions go into them while you work, not only into the chat. One project can be discussed in several channels, and one channel can touch several projects. A channel's topic line can name the project it serves.

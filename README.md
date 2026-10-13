@@ -42,6 +42,7 @@ It sets up how the agent works, not the things around it. Each of these is a sep
 
 - The server: buying, securing and maintaining it. The author's separate guide: https://github.com/Stephane-fci/vps-hardening-playbook
 - The chat connection: installing Agent Bridges and its Discord bot, which has its own install guide.
+- Discord in the browser for working with agents: AgentDisc, a Chrome extension that follows the channel method of [docs/discord.md](docs/discord.md): https://github.com/Stephane-fci/agentdisc
 - A permission system that controls what each member of a team may ask the agent.
 - Skill Forge, a skill that creates, audits and retires skills once the library grows. The skill method in this guide works without it.
 

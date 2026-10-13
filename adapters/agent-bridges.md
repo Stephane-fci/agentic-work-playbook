@@ -1,6 +1,6 @@
 # Agent Bridges: the recommended connection
 
-Agent Bridges connects Claude Code or Codex to Discord (and Slack, if you want it) on your own Linux server. Each channel and each thread is one long conversation with the agent. It is a separate product by the same author, with its own install guide and releases: https://github.com/Stephane-fci/agent-bridges. The repository may not be public yet; if the link does not open, ask the author for access.
+Agent Bridges connects Claude Code or Codex to Discord (and Slack, if you want it) on your own Linux server. Each channel and each thread is one long conversation with the agent. It is a separate product by the same author, with its own install guide and releases: https://github.com/Stephane-fci/agent-bridges. The repository is private for now. Without it, follow the [Claude Code](claude-code.md) or [Codex](codex.md) page instead: the guide still works, with the limits those pages describe.
 
 This guide recommends it for one reason above all. The method needs every boot file read in full at every turn, fresh from disk ([way of working](../docs/way-of-working.md)). Neither engine does that by itself ([Claude Code](claude-code.md), [Codex](codex.md)). The bridge does, on both.
 

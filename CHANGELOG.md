@@ -20,7 +20,7 @@ A rewrite for agents on Claude Code and Codex, built from how Stephane Francesch
 
 ### Added
 
-- The Discord method, optional: one bucket emoji per kind of work at the start of every channel name, end marks for status, threads for side work and a separate category for tests ([docs/discord.md](docs/discord.md)).
+- The Discord method, optional: one bucket emoji per kind of work at the start of every channel name, end marks for status, threads for side work and a separate category for tests ([docs/discord.md](docs/discord.md)). It matches AgentDisc, the author's Chrome extension for Discord in the browser.
 - The full list of background upkeep jobs and on-demand commands ([docs/upkeep.md](docs/upkeep.md)).
 - Filled fictional examples ([examples/](examples/)) and the read-only workspace check ([checks/](checks/)).
 - A short note for existing OpenClaw workspaces ([adapters/openclaw.md](adapters/openclaw.md)).
