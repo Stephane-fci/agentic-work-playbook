@@ -82,10 +82,20 @@ The simpler alternative, without a hook: when all boot files together stay under
 Codex finds skills in `.agents/skills` (in the folder it started in and each folder above it, up to the project root) and in `~/.agents/skills`, not in a plain `skills/` folder. Every `SKILL.md` must start with a `name` and a `description`. Link the folder once, from the top of the workspace:
 
 ```bash
-mkdir -p .agents && ln -s ../skills .agents/skills
+mkdir -p .agents && { [ -e .agents/skills ] || ln -s ../skills .agents/skills; }
 ```
 
 Codex notices edited skills by itself; restart it if a new skill does not appear. Source: https://learn.chatgpt.com/docs/build-skills. More on skills: [skills](../docs/skills.md).
+
+### Scheduled runs
+
+Without the bridge, an upkeep job is started by the server's own scheduler, and nobody is there to approve commands ([upkeep](../docs/upkeep.md)). Start it from the workspace folder with a sandbox that may write in the workspace, and with network access when the job pushes to the backup:
+
+```bash
+codex exec --full-auto -c sandbox_workspace_write.network_access=true "Read skills/wf-<name>/SKILL.md and execute it"
+```
+
+Run each job once by hand with the same command and check its commit and push before you schedule it.
 
 ### 5. Check
 

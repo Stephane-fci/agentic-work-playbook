@@ -25,7 +25,7 @@ Every background job is a workflow: a `wf-` skill, plus a schedule, plus one pla
 There are two ways to schedule jobs. Keep one, never both for the same job.
 
 - With [Agent Bridges](../adapters/agent-bridges.md), recommended: the agent keeps its own job list and manages it with `agent-bridges job add`, `list`, `edit`, `pause`, `run-now` and the rest; `agent-bridges job help` is the full guide. A turn job wakes the agent in a channel with the one-line pointer. A script job runs a command without the model and posts its output. Use a script job when a workflow needs no judgment, such as the backup. Jobs run even when nobody writes.
-- Without the bridge, the server's own scheduler (cron or a systemd timer) runs `claude -p "Read skills/wf-<name>/SKILL.md and execute it"` or `codex exec "Read skills/wf-<name>/SKILL.md and execute it"` from the workspace folder. The skill then posts its own report.
+- Without the bridge, the server's own scheduler (cron or a systemd timer) starts the engine from the workspace folder with the one-line pointer. Nobody is there to approve tools during such a run, so give it the rights the job needs in the command itself. On Claude Code: `claude -p --permission-mode acceptEdits --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git *)" "Read skills/wf-<name>/SKILL.md and execute it"`, adding any other command the skill runs. On Codex: `codex exec` with a sandbox that lets it write in the workspace, and network access when the job pushes ([adapters/codex.md](../adapters/codex.md)). A run without these rights can stop halfway while looking finished, so the run by hand must prove the job's commit and push. The skill then posts its own report.
 
 ## The minimum set
 

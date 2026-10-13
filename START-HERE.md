@@ -33,7 +33,7 @@ What to tell your person: "I read the guide: everything I learn about you and yo
 Change nothing yet. Find out:
 
 - The workspace folder, and whether it is new or already in use.
-- Your engine and its version, and whether Agent Bridges runs you (`sudo agent-bridges doctor`).
+- Your engine and its version, and whether Agent Bridges runs you (`sudo agent-bridges doctor`; without admin rights, ask your person to run it and paste its "Workspace files" line).
 - The Markdown files at the top, which boot file each one matches, and what they already say about you and your person.
 - The folders, connected tools and work in progress.
 - Whether the folder is a Git repository (Git keeps its version history) with a private online copy.
@@ -65,9 +65,9 @@ What to tell your person: "I have a few questions only you can answer; everythin
 Uses [docs/workspace.md](docs/workspace.md), [docs/boot-files.md](docs/boot-files.md) and the [templates/](templates/) for root files, projects, spaces, resources and daily memory.
 
 1. On a workspace already in use, show the list of changes and wait for the yes (rule 3).
-2. Make every change undoable. Not a Git repository yet? Run `git init` and commit what exists, as it is. Already one? Write down `git rev-parse HEAD`: that is [the way back](docs/update.md#the-way-back).
+2. Make every change undoable. Not a Git repository yet? Run `git init`, set the name on saved changes for this workspace only (`git config user.name` and `git config user.email`, with the name your person chooses), then commit what exists, as it is; in an empty folder, make an empty first commit (`git commit --allow-empty -m "Empty workspace"`). Already one? Write down `git rev-parse HEAD`: that is [the way back](docs/update.md#the-way-back).
 3. Create the setup project `projects/agent-setup/`. Its STATE.md says which step is done and what comes next, so a new conversation can continue the setup.
-4. Create the folders that are missing. Add `repositories/` and `dashboards/` only when there is code or a running app.
+4. Create the folders that are missing. Git does not keep empty folders, so create `archives/DONE-LOG.md` and `resources/INDEX.md` now. Add `repositories/` and `dashboards/` only when there is code or a running app; when you add `repositories/`, also add the line `repositories/*/` to `.gitignore`, so each code repository keeps its own history and the workspace keeps only `repositories/INDEX.md`.
 5. Copy WORKSPACE.md, OPERATING-MODE.md and COMMUNICATION.md whole. Where the workspace has its own version, propose a merge instead ([docs/update.md](docs/update.md#three-kinds-of-file)).
 6. Write SOUL.md, IDENTITY.md, USER.md, RULES.md and TOOLS.md from the interview and the files. Start MEMORY.md, today's daily file, and SKILLS.md generated from `skills/`.
 7. Create one space per client or area your person named, and one resources folder per kind of material, each with its INDEX.md.

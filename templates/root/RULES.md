@@ -47,6 +47,6 @@ Every channel name is `<bucket emoji>-<lowercase-words>`, with at most one mark 
 - End marks, only when a mark helps: {emoji} worked on now, {emoji} open but paused, {emoji} waiting on someone, {emoji} done, {emoji} stopped, {emoji} a channel that steers other channels.
 - Retired, never reuse: {emojis no longer used}.
 
-To pick a bucket, take the first that fits: {owner}'s own word for that channel; a test goes to {test emoji}; a registered exception in the naming registry; a `wf-` name goes to the workflow bucket; work for a client or the own business takes its emoji, even when it is research or a repair; otherwise the channel's main purpose. When unsure, ask; never default to the personal bucket.
+To pick a bucket, take the first that fits: {owner}'s own word for that channel; a test goes to {test emoji}; a registered exception in the naming registry; a `wf-` name goes to the workflow bucket {(remove this clause only if no background job reports in Discord)}; work for a client or the own business takes its emoji, even when it is research or a repair; otherwise the channel's main purpose. When unsure, ask; never default to the personal bucket.
 
 Each bucket has one Discord category: the active one holds its {20} most recently active channels, older ones go to `<emoji> <Name> Archive N` categories of up to {50}, and channels {owner} keeps outside any category stay there.

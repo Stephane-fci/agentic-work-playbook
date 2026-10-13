@@ -80,7 +80,7 @@ A new release of the bridge itself installs the way you installed it. It never o
 
 ## Check that it works
 
-1. Run `sudo agent-bridges doctor`. Its "Workspace files" line lists every file the agent gets at every turn, and names the engine's own file. Every boot file must be there, and nothing you meant to leave out.
+1. Run `sudo agent-bridges doctor` (an agent without admin rights asks its person to run it and paste the "Workspace files" line). Its "Workspace files" line lists every file the agent gets at every turn, and names the engine's own file. Every boot file must be there, and nothing you meant to leave out.
 2. Run the loading check in [verify](../docs/verify.md): a unique last line in each boot file, a fresh turn, and the agent quotes every last line without opening a file.
 3. Change one of those last lines, send a new message in the same conversation, and ask again. The agent must quote the new line. This is what the bridge adds over a plain engine.
 

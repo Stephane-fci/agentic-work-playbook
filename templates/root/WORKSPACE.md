@@ -31,7 +31,7 @@ business          the actual content
                   resources/, archives/
 ```
 
-Every Markdown file at the top of the workspace is a boot file, read in full at every turn. The engine's connection delivers them fresh at each turn, so a change counts from the next message and a new root file becomes a boot file at once. Keep only boot files at the root.
+Every Markdown file at the top of the workspace is a boot file, read in full. With Agent Bridges, the connection delivers them fresh at each turn, so a change counts from the next message and a new root file becomes a boot file at once; without it, the engine reads them when a conversation starts, so a change counts from the next conversation (see AGENTS.md). Keep only boot files at the root.
 
 The placement test: copy the file to another agent. Still true? It is shared method. Wrong name, person or keys? It belongs to this agent and its owner. Only exists because of the engine? It is an engine file. Improving a shared file improves every agent at once; what one agent learns about its client never leaks to the others.
 

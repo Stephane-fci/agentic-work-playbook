@@ -131,6 +131,17 @@ for path in *.md; do
   fi
 done
 if [ -n "$extras" ]; then note "extra boot files, also read at every turn:$extras"; fi
+if [ -f CLAUDE.md ]; then
+  missing_imports=""
+  for path in *.md; do
+    [ -f "$path" ] || continue
+    [ "$path" = "CLAUDE.md" ] && continue
+    grep -qx "@$path" CLAUDE.md || missing_imports="$missing_imports $path"
+  done
+  if [ -n "$missing_imports" ]; then
+    warn "CLAUDE.md has no @ line for:$missing_imports. Without Agent Bridges, Claude Code never loads a root file that CLAUDE.md does not import; add one line per file, or leave it out on purpose and say why (adapters/claude-code.md)."
+  fi
+fi
 if [ -f AGENTS.md ] && [ "$(file_size AGENTS.md)" -gt 32768 ]; then
   warn "AGENTS.md is larger than 32 KB. Codex without Agent Bridges stops reading project instructions at 32 KB (see adapters/codex.md)."
 fi

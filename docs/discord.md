@@ -83,7 +83,7 @@ Keep a short list of retired emojis that are never reused, so an old channel nam
 
 1. List your clients. Each one gets its own emoji, easy to recognize.
 2. List your own businesses or ventures. Each one you work on for a long time gets its own emoji.
-3. List the kinds of work you do with agents: work on the agents themselves, scheduled workflows, tools and skills, repairs, research, content and personal brand, personal life, tests. Keep only the ones you use.
+3. List the kinds of work you do with agents: work on the agents themselves, scheduled workflows, tools and skills, repairs, research, content and personal brand, personal life, tests. Keep only the ones you use, but keep the workflow bucket whenever your background jobs report in Discord channels: each job has its own channel ([upkeep](upkeep.md)), and those channels need a bucket.
 4. Pick one distinct emoji per bucket. Avoid emojis that look alike, and keep the end marks out of the bucket list.
 5. Write the legend in RULES.md, in a section called "Discord: how we work". RULES.md is a boot file, so every agent knows the legend at every turn ([boot files](boot-files.md)). The RULES.md template in [templates](../templates/) has the section ready.
 6. If you need more detail, keep it in one registry: the category names and ids, the name parts that mean a client (for example `maple-`), the exceptions and the history of changes. The CONTEXT.md of a channel-naming skill is a good home ([skills](skills.md)). The legend in RULES.md stays the one list of meanings: change a bucket there first, then in the registry.
