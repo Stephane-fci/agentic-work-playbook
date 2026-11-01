@@ -72,7 +72,7 @@ A skill the person names is a command, not a suggestion: the agent uses that ski
 
 ## Scheduled workflows are wf- skills
 
-A job that runs on a schedule is a `wf-` skill plus a schedule plus one place to report. The schedule holds one line: "Read skills/wf-<name>/SKILL.md and execute it." All behavior lives in the skill, so changing a workflow means editing one obvious file. A `wf-` skill's description says only "Scheduled workflow. Runs only from its scheduled job; not for conversational use.", so a conversation never starts it by accident. Every report starts with one status icon and ends with a line naming the skill file to edit. The jobs, how to schedule them and the reporting rules are in [upkeep.md](upkeep.md).
+A job that runs on a schedule is a `wf-` skill plus one scheduled job, one place to report, the agent in charge of it and a check of its result. The schedule holds one line: "Read skills/wf-<name>/SKILL.md and execute it." All behavior lives in the skill, so changing a workflow means editing one obvious file. A `wf-` skill's description says only "Scheduled workflow. Runs only from its scheduled job; not for conversational use.", so a conversation never starts it by accident. Every report starts with one status icon and ends with a line naming the skill file to edit. The jobs, how to schedule them and the reporting rules are in [upkeep.md](upkeep.md).
 
 ## Commands are cd- skills
 

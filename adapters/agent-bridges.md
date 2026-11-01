@@ -67,10 +67,13 @@ A change to `config.json` (other than who may talk to the bot) applies at the br
 
 ## Upkeep jobs
 
-The bridge runs the agent's own repeating jobs, the same way on Claude Code and Codex, even when nobody writes. That is where this guide's upkeep jobs live ([upkeep](../docs/upkeep.md)). There are two kinds:
+The bridge runs the agent's own repeating jobs, the same way on Claude Code and Codex, even when nobody writes. That is where this guide's upkeep jobs live ([upkeep](../docs/upkeep.md)). There are three kinds:
 
 - A turn job wakes the agent in a channel with a task. For upkeep, the task only points to the job's `wf-` skill, which holds all the behavior.
 - A script job runs a command in the workspace without the model and posts its output, or only its failures. It suits purely mechanical work.
+- A script job with `--then` runs the command first and hands its output to the agent with a task, for code followed by judgment.
+
+Each run starts its own conversation, so it works from the skill and the run's records, not from the channel's earlier chat.
 
 The agent makes the jobs itself, from the channel where the reports should go (or with `--channel` and a channel id):
 
@@ -79,7 +82,9 @@ agent-bridges job add --name "Daily backup" --cron "50 2 * * *" --tz Europe/Pari
 agent-bridges job list
 ```
 
-`agent-bridges job help` explains every option. The list lives in the workspace, in `.agent-bridges/<instance>/jobs.json`. After the bridge was off, the newest missed run happens once, up to a day late. A failed run posts a warning in its channel. Keep one scheduler: do not put the same jobs in the server's own scheduler as well.
+`agent-bridges job help` explains every option. The list lives in the workspace, in `.agent-bridges/<instance>/jobs.json`. After the bridge was off, the newest missed run happens once, up to a day late.
+
+A failed, cut or missed run posts its warning in its channel and wakes the agent there once, to repair it; further failures join the same open problem, and a clean run closes it. `--guide` names the skill the repair reads, `--in-charge` the person responsible, and `--on-problem post` keeps the warning without the wake. `--result-check` adds a read-only command that checks each run's real result in code; a refusal counts as a problem too. A script that meets a passing cause, such as a rate limit, can ask for one later retry of only the part that failed, at most a few a day and never past the next regular run. Keep one scheduler: do not put the same jobs in the server's own scheduler as well.
 
 ## Tested engine updates
 

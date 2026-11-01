@@ -30,6 +30,11 @@ Post the report to the one reporting place named in CONTEXT.md. Its first charac
 
 📋 `skills/{skill-name}/SKILL.md`: edit this file to change behavior
 
+{Scheduled workflow only, otherwise delete this section:}
+## When woken for a problem
+
+The agent in charge is woken once when a run fails, is cut, is missed or its result check refuses. Read the run's output, CONTEXT.md, LEARNINGS.md and the last LOGS.md lines, and check what the run already did before repeating any step. Find the cause, fix it, and prove the fix with one more run. A cause that passes by itself gets one later retry of only the failed part. After two fixes that did not hold, or when only a person can give what is missing, ask them once in this job's channel. Post one short note in the report's shape: icon first, the file to edit last.
+
 ## Before every run
 
 Read, from this skill's folder:

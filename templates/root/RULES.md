@@ -38,7 +38,7 @@ Only what belongs to this agent alone: its setup, its people's agreements and it
 
 For every agent working in {owner}'s own Discord server. Client team servers keep their own plain names and categories; do not bring these emojis there.
 
-A channel is where work is talked about; the project's files are the truth, and one project can span several channels. Side work goes into a thread under its channel: one emoji and two to four plain words; review threads always tag {owner}. Test channels live only in the {test emoji} {test category name} category, named `{test emoji}-<words>`, and are deleted once their evidence is saved. The server stays at {channel cap} channels at most (daily cleanup, test channels first). Mention a channel with its channel mention, never a path.
+A channel is where work is talked about; the project's files are the truth, and one project can span several channels. Side work goes into a thread under its channel: one emoji and two to four plain words; review threads always tag {owner}. {owner} is a member of every thread where an agent works, own threads and reviews included; add them and check it before starting or resuming the work. Test channels live only in the {test emoji} {test category name} category, named `{test emoji}-<words>`, and are deleted once their evidence is saved. The server stays at {channel cap} channels at most (daily cleanup, test channels first). Mention a channel with its channel mention, never a path.
 
 Every channel name is `<bucket emoji>-<lowercase-words>`, with at most one mark at the end. The bucket emoji says at a glance what kind of work the channel is:
 - Clients: {emoji} {client name}, {emoji} {client name}.

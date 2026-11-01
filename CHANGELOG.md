@@ -2,6 +2,18 @@
 
 The guide's version lives in [VERSION](VERSION). Each entry says what changed and why. How a workspace moves from one version to the next is in [docs/update.md](docs/update.md).
 
+## 3.1.0 (November 2026)
+
+The monthly check brought the guide in line with how the author's agents work today.
+
+### Changed
+
+- Background jobs have an agent in charge. Every job ends with a check in code of its real result, and a run that fails, is cut, is missed or fails that check wakes the agent once to find the cause, fix it and prove the fix. Jobs come in three kinds: agent, script, and script then agent ([docs/upkeep.md](docs/upkeep.md), [adapters/agent-bridges.md](adapters/agent-bridges.md)). Why: a job that only posted a warning waited for someone to notice it.
+- The skill template has a short section for that repair wake ([templates/skill/SKILL.md](templates/skill/SKILL.md)).
+- The owner is a member of every thread where an agent works, own threads and reviews included, so no working thread is hidden from them ([docs/discord.md](docs/discord.md), [templates/root/RULES.md](templates/root/RULES.md)).
+- OPERATING-MODE.md starts with the simplest reliable way: use what already works, add only what the result needs, and weigh the whole cost of anything lasting ([templates/root/OPERATING-MODE.md](templates/root/OPERATING-MODE.md)). Why: extra machinery costs more to check and keep than it saves.
+- COMMUNICATION.md: a long answer's summary line is no longer bold; a short link label is fine where the chat shows it as a link, as Discord and Slack do through Agent Bridges; tools go by their real names; prose in files is never hard-wrapped; the tag that pings a whole server is never written out; and a state is named as it really is ([templates/root/COMMUNICATION.md](templates/root/COMMUNICATION.md)).
+
 ## 3.0.0 (October 2026)
 
 A rewrite for agents on Claude Code and Codex, built from how Stephane Franceschini (Steph France) works with his own agents today. The method is the same at heart; the guide around it is new.

@@ -14,6 +14,8 @@ Side work goes into a thread under its channel, so the main conversation stays s
 
 A thread shows in a person's sidebar once they have joined it, and a tag adds them. So when a thread needs a person, tag them in its first message. A review thread always tags the owner.
 
+The owner is a member of every thread where an agent works, including the agent's own side threads and reviews, so no working thread is hidden from them. Membership is not a notification: the agent can add the owner to a thread without a tag. Before it starts or resumes work in a thread, the agent adds the owner if needed and checks that they are a member.
+
 Tests get their own category. Create every test channel there from the start, named with the test emoji, like `🧪-checkout-test`. When the test is done, save its evidence (the result, the screenshots that matter) in the project that owns the work, then delete the channel. Working channels never host tests.
 
 Discord allows at most 500 channels per server. Categories count toward that number; threads do not. Keep your own lower cap, for example 400, so there is always room. A daily cleanup job keeps the server under it: test channels go first, then the channels with the oldest activity. Before it deletes a channel, it saves a full copy of it (messages and files) in the workspace, and a channel it cannot fully save stays. The job is described in [upkeep](upkeep.md).
@@ -100,7 +102,7 @@ Here is the section for a made-up owner with two clients (a bakery and a fitness
 
 For every agent working in the owner's own Discord server. Client team servers keep their own plain names and categories; do not bring these emojis there.
 
-A channel is where work is talked about; the project's files are the truth, and one project can span several channels. Side work goes into a thread under its channel: one emoji and two to four plain words; review threads always tag the owner. Test channels live only in the 🧪 Tests category, named `🧪-<words>`, and are deleted once their evidence is saved. The server stays at 400 channels at most (daily cleanup, test channels first). Mention a channel with its channel mention, never a path.
+A channel is where work is talked about; the project's files are the truth, and one project can span several channels. Side work goes into a thread under its channel: one emoji and two to four plain words; review threads always tag the owner. The owner is a member of every thread where an agent works, own threads and reviews included; add them and check it before starting or resuming the work. Test channels live only in the 🧪 Tests category, named `🧪-<words>`, and are deleted once their evidence is saved. The server stays at 400 channels at most (daily cleanup, test channels first). Mention a channel with its channel mention, never a path.
 
 Every channel name is `<bucket emoji>-<lowercase-words>`, with at most one mark at the end. The bucket emoji says at a glance what kind of work the channel is:
 - Clients: 🥐 Maple Street Bakery, 💪 PulseFit (fitness app).
